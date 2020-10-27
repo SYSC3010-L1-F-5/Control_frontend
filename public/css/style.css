@@ -1,0 +1,68 @@
+html, body {
+    min-height: 100vh;
+    max-width: 100vw;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.hss-body-wrapper {
+    display: flex;
+    flex-direction: row;
+    margin: 16px;
+    flex: 1;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin: 0 16px;
+}
+
+.hss-width-100 {
+    width: 100%
+}
+
+.hss-display-none {
+    display: none;
+}
+
+.hss-drawer {
+    width: 12rem;
+    margin: 0 auto;
+}
+
+.hss-drawer-hidden {
+
+}
+
+.hss-navbar {
+    height: 64px;
+    padding: 16px;
+    backdrop-filter: blur(5px);
+    background: rgba(247,248,249,.65);
+    left: 0;
+}
+
+.hss-login-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+}
+
+.hss-login {
+    width: 48vw;
+    max-width: 600px;
+    margin: auto;
+    height: auto;
+}
+
+@media (max-width: 600px) {
+    .hss-login {
+        width: 90vw;
+    }
+}

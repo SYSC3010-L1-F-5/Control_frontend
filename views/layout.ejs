@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <%- include('./partials/head'); %>
+    </head>
+    <body data-barba="wrapper" class="">
+        <%- include('./partials/header'); %>
+        <div class="hss-body-wrapper">
+            <%- include('./partials/drawer', {
+                name: name
+            }); %>
+        
+            <main data-barba="container" data-barba-namespace="<%= name %>">
+            <!-- put here the content you wish to change
+            between your pages, like your main content <h1> or <p> -->
+                <%- include('./pages/' + name); %>
+            </main>
+        </div>
+        
+        <%- include('./partials/footer'); %>
+        
+        <%- include('./js/layout.ejs'); %>
+        <script src="/js/js.js"></script>
+    
+        <!-- put here content that will not change
+        between your pages, like <footer> -->
+    </body>
+</html>
