@@ -1,0 +1,46 @@
+<div class="mdui-card hss-card">
+    <div class="mdui-card-primary">
+        <div class="mdui-card-primary-title">
+            Users
+            <button class="mdui-btn mdui-ripple mdui-float-right" mdui-dialog="{target: '#user-add'}">Add</button>
+        </div>
+    </div>
+    <div class="mdui-progress" id="user-loading">
+        <div class="mdui-progress-indeterminate"></div>
+    </div>
+    <div class="mdui-table-fluid hss-shadow-0 hss-table-border-0">
+        <table class="mdui-table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Type</th>
+              <th>Email</th>
+              <th>Link</th>
+            </tr>
+          </thead>
+          <tbody id="users-table-body">
+          </tbody>
+        </table>
+    </div>
+</div>
+<div class="mdui-dialog" id="user-add">
+    <div class="mdui-dialog-title">Add a user</div>
+    <div class="mdui-dialog-content">
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">Username</label>
+            <input class="mdui-textfield-input" type="text" id="new-user-name"/>
+        </div>
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">Password</label>
+            <input class="mdui-textfield-input" type="text" id="new-user-password"/>
+        </div>
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">Type</label>
+            <input class="mdui-textfield-input" type="text" id="new-user-type"/>
+        </div>
+    </div>
+    <div class="mdui-dialog-actions">
+      <button class="mdui-btn mdui-ripple" mdui-dialog-close>Cancel</button>
+      <button class="mdui-btn mdui-ripple" onclick="runtime.user.functions.addUser()">Confirm</button>
+    </div>
+</div>

@@ -3,21 +3,18 @@
     <head>
         <%- include('./partials/head'); %>
     </head>
-    <body data-barba="wrapper" class="">
+    <body data-barba="wrapper" class="mdui-theme-primary-indigo mdui-theme-accent-teal mdui-appbar-with-toolbar mdui-bottom-nav-fixed">
         <%- include('./partials/header'); %>
-        <div class="hss-body-wrapper">
-            <%- include('./partials/drawer', {
-                name: name
-            }); %>
         
-            <main data-barba="container" data-barba-namespace="<%= name %>">
+        <main data-barba="container" data-barba-namespace="<%= name %>" class="mdui-container hss-container">
             <!-- put here the content you wish to change
             between your pages, like your main content <h1> or <p> -->
-                <%- include('./pages/' + name); %>
-            </main>
-        </div>
+            <%- include('./pages/' + name); %>
+        </main>
         
-        <%- include('./partials/footer'); %>
+        <%- include('./partials/footer', {
+            name
+        }); %>
         
         <%- include('./js/layout.ejs'); %>
         <script src="/js/js.js"></script>

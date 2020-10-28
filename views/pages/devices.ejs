@@ -1,0 +1,57 @@
+<div class="mdui-card hss-card">
+    <div class="mdui-card-primary">
+        <div class="mdui-card-primary-title">
+            Devices
+            <button class="mdui-btn mdui-ripple mdui-float-right" mdui-dialog="{target: '#device-add'}">Add</button>
+        </div>
+    </div>
+    <div class="mdui-progress" id="device-loading">
+        <div class="mdui-progress-indeterminate"></div>
+    </div>
+    <div class="mdui-table-fluid hss-shadow-0 hss-table-border-0">
+        <table class="mdui-table">
+          <thead>
+            <tr>
+              <th>IP</th>
+              <th>Port</th>
+              <th>Zone</th>
+              <th>Type</th>
+              <th>Name</th>
+              <th>Pulse</th>
+              <th>Link</th>
+            </tr>
+          </thead>
+          <tbody id="devices-table-body">
+          </tbody>
+        </table>
+    </div>
+</div>
+<div class="mdui-dialog" id="device-add">
+    <div class="mdui-dialog-title">Add a device</div>
+    <div class="mdui-dialog-content">
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">IP</label>
+            <input class="mdui-textfield-input" type="text" id="new-device-ip"/>
+        </div>
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">Port</label>
+            <input class="mdui-textfield-input" type="number" id="new-device-port"/>
+        </div>
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">Zone</label>
+            <input class="mdui-textfield-input" type="text" id="new-device-zone"/>
+        </div>
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">Type</label>
+            <input class="mdui-textfield-input" type="text" id="new-device-type"/>
+        </div>
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">Name</label>
+            <input class="mdui-textfield-input" type="text" id="new-device-name"/>
+        </div>
+    </div>
+    <div class="mdui-dialog-actions">
+      <button class="mdui-btn mdui-ripple" mdui-dialog-close>Cancel</button>
+      <button class="mdui-btn mdui-ripple" onclick="runtime.devices.functions.addDevice()">Confirm</button>
+    </div>
+</div>

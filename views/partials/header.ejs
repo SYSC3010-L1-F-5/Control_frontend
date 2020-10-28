@@ -1,13 +1,6 @@
-<header class="navbar hss-navbar">
-  <section class="navbar-section">
-    <a class="off-canvas-toggle btn btn-link btn-action" id="drawer-button"><i class="icon icon-menu"></i></a>
-  </section>
-  <section class="navbar-section">
-    <a class="navbar-brand mr-2 text-center hss-width-100">Home Surveillance System</a>
-  </section>
-  <section class="navbar-section">
-    <div class="input-group input-inline">
-      <button class="btn btn-primary input-group-btn" onclick="runtime.user.functions.logout()" id="logout-button">Logout</button>
-    </div>
-  </section>
+<header class="mdui-appbar mdui-appbar-fixed mdui-appbar-scroll-hide">
+  <div class="mdui-toolbar mdui-color-theme">
+    <a href="javascript:;" class="mdui-typo-headline">Home Surveillance System</a>
+    <div class="mdui-toolbar-spacer"></div>
+    <button class="mdui-btn mdui-btn-icon" onclick="runtime.user.functions.logout()" id="logout-button" mdui-tooltip="{content: 'Logout'}"><i class="mdui-icon material-icons">clear</i></button>
 </header>

@@ -90,42 +90,18 @@ function calculateUUID() {
     return userUUID
 }
 
-function checkAuth(otp, uuid) {
-    const serverAddr = getServerAddrFromLS()
-    axios.get((serverAddr + '/user'), {
-        headers: {
-            X_UUID: uuid,
-            X_OTP: otp
-        }
-    })
-    .then(function (response) {
-        console.log(response)
-        runtime.user.uuid = uuid
-        runtime.user.otp = otp
-        return true
-    })
-    .catch(function (error) {
-        toLogin()
-        console.log(error)
-        return false
-    });
+function getUUID() {
+    if (runtime.user.uuid === undefined) {
+        runtime.user.uuid = localStorage.getItem("X-UUID")
+    }
+    return runtime.user.uuid
 }
 
-function checkRememberMe() {
-    var authOTP = localStorage.getItem("X-OTP")
-    var authUUID = localStorage.getItem("X-UUID")
-    console.log("checkRememberMe")
-    if (authOTP === null && authUUID === null) {
-        toLogin()
-    } else {
-        if (window.location.pathname !== "/login") {
-            isAuthed = checkAuth(authOTP, authUUID)
-            return isAuthed
-        } else {
-            clearLS()
-        }
+function getOTP() {
+    if (runtime.user.otp === undefined) {
+        runtime.user.otp = localStorage.getItem("X-OTP")
     }
-    return true
+    return runtime.user.otp
 }
 
 function clearLS() {
@@ -133,17 +109,161 @@ function clearLS() {
     localStorage.removeItem("X-OTP")
 }
 
+function errorDialog(title, content) {
+    document.getElementById("hss-error-dialog-title").textContent = title
+    document.getElementById("hss-error-dialog-content").textContent = content
+    new mdui.Dialog('#hss-error-dialog').open()
+}
+
 function logout() {
     const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
     axios.delete((serverAddr + '/user/logout'), {
         headers: {
-            X_UUID: runtime.user.uuid,
-            X_OTP: runtime.user.otp
+            X_UUID: getUUID(),
+            X_OTP: getOTP()
         }
     })
     .then(function (response) {
         console.log(response)
         toLogin()
+        return true
+    })
+    .catch(function (error) {
+        console.log(error)
+        runtime.misc.functions.errorDialog(error.response.status, error.response.data.message)
+        toLogin()
+        return false
+    });
+}
+
+function getDevices() {
+    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+    axios.get((serverAddr + '/devices'), {
+        headers: {
+            X_UUID: getUUID(),
+            X_OTP: getOTP()
+        }
+    })
+    .then(function (response) {
+        document.getElementById("device-loading").style.opacity = 0
+        runtime.devices.list = response.data.message
+        if (runtime.devices.list === null) {
+
+        } else {
+            for (var i = 0; i < runtime.devices.list.length; i++) {
+                device = runtime.devices.list[i]
+                document.getElementById("devices-table-body").innerHTML += `<tr>
+                <td>${device.ip}</td><td>${device.port}</td><td>${device.zone}</td><td>${device.type}</td><td>${device.name}</td><td>${device.pulse}</td><td>${device.uuid}</td></tr>`
+            }
+        }
+        return true
+    })
+    .catch(function (error) {
+        console.log(error.response)
+        if (error.response.status === 401) {
+            toLogin()
+        }
+        return false
+    });
+}
+
+function getUser() {
+    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+    axios.get((serverAddr + '/user'), {
+        headers: {
+            X_UUID: getUUID(),
+            X_OTP: getOTP()
+        }
+    })
+    .then(function (response) {
+        runtime.user.details = response.data.message
+        return true
+    })
+    .catch(function (error) {
+        console.log(error)
+        if (error.response.status === 401) {
+            toLogin()
+        }
+        return false
+    });
+}
+
+function getUsers() {
+    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+    axios.get((serverAddr + '/users'), {
+        headers: {
+            X_UUID: getUUID(),
+            X_OTP: getOTP()
+        }
+    })
+    .then(function (response) {
+        document.getElementById("user-loading").style.opacity = 0
+        runtime.user.list = response.data.message
+        if (runtime.user.list === null) {
+            runtime.misc.functions.errorDialog("No user detail received", "The system has no user added, please add user first") // impossible
+        } else {
+            for (var i = 0; i < runtime.user.list.length; i++) {
+                user = runtime.user.list[i]
+                document.getElementById("users-table-body").innerHTML += `<tr><td>${user.username}</td><td>${user.type}</td><td>${user.email}</td><td>${user.uuid}</td></tr>`
+            }
+        }
+        return true
+    })
+    .catch(function (error) {
+        console.log(error)
+        if (error.response.status === 401) {
+            toLogin()
+        } else {
+            document.getElementById("user-loading").style.opacity = 0
+            runtime.misc.functions.errorDialog(error.response.status, error.response.data.message)
+        }
+        return false
+    });
+}
+
+function addDevice() {
+    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+    axios.post((serverAddr + '/device/add'), {
+        ip: document.getElementById("new-device-ip").value,
+        port: document.getElementById("new-device-port").value,
+        type: document.getElementById("new-device-type").value,
+        zone: document.getElementById("new-device-zone").value,
+        name: document.getElementById("new-device-name").value
+    },{
+        headers: {
+            X_UUID: getUUID(),
+            X_OTP: getOTP()
+        }
+    })
+    .then(function (response) {
+        console.log(response)
+        
+        return true
+    })
+    .catch(function (error) {
+        console.log(error)
+        return false
+    });
+}
+
+function addUser() {
+    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+    const fields = {
+        username: document.getElementById("new-user-name").value,
+        password: CryptoJS.MD5(document.getElementById("new-user-password").value).toString(),
+        type: document.getElementById("new-user-type").value
+    }
+    axios.post((serverAddr + '/user/add'), {
+        fields: JSON.stringify(fields)
+    },{
+        headers: {
+            X_UUID: getUUID(),
+            X_OTP: getOTP()
+        }
+    })
+    .then(function (response) {
+        console.log(response)
+        
         return true
     })
     .catch(function (error) {
@@ -164,19 +284,36 @@ window.runtime = {
     },
     user: {
         init: {
-            checkRememberMe
         },
         functions: {
             tryAuth,
             tryAuthFromForm,
             toLogin,
-            checkAuth,
             calculateUUID,
             clearLS,
-            logout
+            logout,
+            getUUID,
+            getOTP,
+            getUser,
+            getUsers,
+            addUser
         }
+    },
+    devices: {
+        functions: {
+            getDevices,
+            addDevice
+        }
+    },
+    events: {
+
     },
     inited: {
         state: false
     },
+    misc: {
+        functions: {
+            errorDialog
+        }
+    }
 }
