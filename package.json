@@ -1,8 +1,10 @@
 {
   "scripts": {
-    "dev": "nodemon ./app.js 0.0.0.0 8080"
+    "dev": "cross-env NODE_ENV=development nodemon app.js",
+    "start": "cross-env NODE_ENV=production node app.js --production"
   },
   "dependencies": {
+    "cross-env": "^7.0.2",
     "ejs": "^3.1.5",
     "express": "^4.17.1",
     "nodemon": "^2.0.6"
