@@ -3,7 +3,7 @@
         <div class="mdui-card-primary-title">
             Devices
             <button class="mdui-btn mdui-ripple mdui-btn-icon mdui-float-right mdui-color-theme-accent hss-margin-left-8" onclick="runtime.devices.functions.getDevices()" mdui-tooltip="{content: 'Refresh'}" id="device-list-refresh" disabled><i class="mdui-icon material-icons">refresh</i></button>
-            <button class="mdui-btn mdui-ripple mdui-btn-icon mdui-float-right mdui-color-theme-accent" mdui-tooltip="{content: 'Add a new device'}" onclick="new mdui.Dialog('#device-add').open()" hss-permission="admin" disabled><i class="mdui-icon material-icons">add</i></button>
+            <button class="mdui-btn mdui-ripple mdui-btn-icon mdui-float-right mdui-color-theme-accent" mdui-tooltip="{content: 'Add a new device'}" onclick="runtime.devices.functions.addDialog()" hss-permission="admin" disabled><i class="mdui-icon material-icons">add</i></button>
         </div>
     </div>
     <div class="mdui-progress" id="device-loading">
@@ -33,28 +33,28 @@
     <div class="mdui-dialog-content">
         <div class="mdui-textfield">
             <label class="mdui-textfield-label">IP</label>
-            <input class="mdui-textfield-input" type="text" id="new-device-ip"/>
+            <input class="mdui-textfield-input" type="text" id="new-device-ip" pattern="^(localhost|(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))?$"/>
         </div>
         <div class="mdui-textfield">
             <label class="mdui-textfield-label">Port</label>
-            <input class="mdui-textfield-input" type="number" id="new-device-port"/>
+            <input class="mdui-textfield-input" type="number" id="new-device-port" pattern="^([0-9]|[1-9][0-9]|[1-9][0-9]{2}|[1-9][0-9]{3}|[1-5][0-9]{4}|6([0-4][0-9]{3}|5([0-4][0-9]{2}|5([0-2][0-9]|3[0-5]))))?$"/>
         </div>
         <div class="mdui-textfield">
             <label class="mdui-textfield-label">Zone</label>
-            <input class="mdui-textfield-input" type="text" id="new-device-zone"/>
+            <input class="mdui-textfield-input" type="text" id="new-device-zone" pattern="[^' ']+"/>
         </div>
         <div class="mdui-textfield">
             <label class="mdui-textfield-label">Type</label>
-            <input class="mdui-textfield-input" type="text" id="new-device-type"/>
+            <input class="mdui-textfield-input" type="text" id="new-device-type" pattern="[^' ']+"/>
         </div>
         <div class="mdui-textfield">
             <label class="mdui-textfield-label">Name</label>
-            <input class="mdui-textfield-input" type="text" id="new-device-name"/>
+            <input class="mdui-textfield-input" type="text" id="new-device-name" pattern="[^' ']+"/>
         </div>
     </div>
     <div class="mdui-dialog-actions">
-      <button class="mdui-btn mdui-ripple" mdui-dialog-close>Cancel</button>
-      <button class="mdui-btn mdui-ripple" onclick="runtime.devices.functions.addDevice()" mdui-dialog-close>Confirm</button>
+      <button class="mdui-btn mdui-ripple" onclick="runtime.misc.current_dialog.close()">Cancel</button>
+      <button class="mdui-btn mdui-ripple" onclick="runtime.devices.functions.addDevice()">Confirm</button>
     </div>
 </div>
 <div class="mdui-dialog" id="device-add-callback-dialog">
@@ -79,28 +79,28 @@
         </div>
         <div class="mdui-textfield">
             <label class="mdui-textfield-label">IP</label>
-            <input class="mdui-textfield-input" type="text" id="device-settings-ip"/>
+            <input class="mdui-textfield-input" type="text" id="device-settings-ip" pattern="^(localhost|(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))?$"/>
         </div>
         <div class="mdui-textfield">
             <label class="mdui-textfield-label">Port</label>
-            <input class="mdui-textfield-input" type="number" id="device-settings-port"/>
+            <input class="mdui-textfield-input" type="number" id="device-settings-port" pattern="^([0-9]|[1-9][0-9]|[1-9][0-9]{2}|[1-9][0-9]{3}|[1-5][0-9]{4}|6([0-4][0-9]{3}|5([0-4][0-9]{2}|5([0-2][0-9]|3[0-5]))))?$"/>
         </div>
         <div class="mdui-textfield">
             <label class="mdui-textfield-label">Zone</label>
-            <input class="mdui-textfield-input" type="text" id="device-settings-zone"/>
+            <input class="mdui-textfield-input" type="text" id="device-settings-zone" pattern="[^' ']+"/>
         </div>
         <div class="mdui-textfield">
             <label class="mdui-textfield-label">Type</label>
-            <input class="mdui-textfield-input" type="text" id="device-settings-type"/>
+            <input class="mdui-textfield-input" type="text" id="device-settings-type" pattern="[^' ']+"/>
         </div>
         <div class="mdui-textfield">
             <label class="mdui-textfield-label">Name</label>
-            <input class="mdui-textfield-input" type="text" id="device-settings-name"/>
+            <input class="mdui-textfield-input" type="text" id="device-settings-name" pattern="[^' ']+"/>
         </div>
     </div>
     <div class="mdui-dialog-actions">
-      <button class="mdui-btn mdui-ripple" mdui-dialog-close>Cancel</button>
-      <button class="mdui-btn mdui-ripple" onclick="runtime.devices.functions.updateDevice()" mdui-dialog-close>Confirm</button>
+      <button class="mdui-btn mdui-ripple" onclick="runtime.misc.current_dialog.close()">Cancel</button>
+      <button class="mdui-btn mdui-ripple" onclick="runtime.devices.functions.updateDevice()">Confirm</button>
     </div>
 </div>
 <div class="mdui-dialog" id="device-deletion" hss-permission="admin">

@@ -2,9 +2,9 @@
     <div class="mdui-card-primary">
         <div class="mdui-card-primary-title">
             Users
-            <button class="mdui-btn mdui-ripple mdui-btn-icon mdui-color-theme-accent mdui-float-right hss-margin-left-8" mdui-dialog="{target: '#account-settings'}" mdui-tooltip="{content: 'Account Settings'}" onclick="document.getElementById('update-user-name').value=runtime.user.details.username"><i class="mdui-icon material-icons">settings</i></button>
+            <button class="mdui-btn mdui-ripple mdui-btn-icon mdui-color-theme-accent mdui-float-right hss-margin-left-8"  mdui-tooltip="{content: 'Account Settings'}" onclick="runtime.user.functions.accountSettingsDialog()"><i class="mdui-icon material-icons">settings</i></button>
             <button class="mdui-btn mdui-ripple mdui-btn-icon mdui-float-right mdui-color-theme-accent hss-margin-left-8" onclick="runtime.user.functions.getUsers()" mdui-tooltip="{content: 'Refresh'}" hss-permission="admin" id="user-list-refresh" disabled><i class="mdui-icon material-icons">refresh</i></button>
-            <button class="mdui-btn mdui-ripple mdui-btn-icon mdui-color-theme-accent mdui-float-right" mdui-tooltip="{content: 'Add a new user'}" hss-permission="admin" disabled onclick="new mdui.Dialog('#user-add').open()"><i class="mdui-icon material-icons" disabled>add</i></button>
+            <button class="mdui-btn mdui-ripple mdui-btn-icon mdui-color-theme-accent mdui-float-right" mdui-tooltip="{content: 'Add a new user'}" hss-permission="admin" disabled onclick="runtime.user.functions.addDialogForUser()"><i class="mdui-icon material-icons" disabled>add</i></button>
         </div>
     </div>
     <div class="mdui-progress" id="user-loading">
@@ -31,20 +31,23 @@
     <div class="mdui-dialog-content">
         <div class="mdui-textfield">
             <label class="mdui-textfield-label">Username</label>
-            <input class="mdui-textfield-input" type="text" id="new-user-name"/>
+            <input class="mdui-textfield-input" type="text" id="new-user-name" pattern="[a-zA-Z0-9]+"/>
         </div>
         <div class="mdui-textfield">
             <label class="mdui-textfield-label">Password</label>
-            <input class="mdui-textfield-input" type="text" id="new-user-password"/>
+            <input class="mdui-textfield-input" type="password" pattern="[^' ']+" id="new-user-password"/>
         </div>
-        <div class="mdui-textfield">
-            <label class="mdui-textfield-label">Type</label>
-            <input class="mdui-textfield-input" type="text" id="new-user-type"/>
+        <div class="mdui-textfield hss-overflow-visible">
+            <label class="mdui-checkbox">
+                <input type="checkbox"  id="new-user-type"/>
+                <i class="mdui-checkbox-icon"></i>
+                Admin
+            </label>
         </div>
     </div>
     <div class="mdui-dialog-actions">
-      <button class="mdui-btn mdui-ripple" mdui-dialog-close>Cancel</button>
-      <button class="mdui-btn mdui-ripple" onclick="runtime.user.functions.addUser()" mdui-dialog-close>Confirm</button>
+      <button class="mdui-btn mdui-ripple" onclick="runtime.misc.current_dialog.close()">Cancel</button>
+      <button class="mdui-btn mdui-ripple" onclick="runtime.user.functions.addUser()">Confirm</button>
     </div>
 </div>
 <div class="mdui-dialog" id="account-settings">
@@ -52,21 +55,21 @@
     <div class="mdui-dialog-content">
         <div class="mdui-textfield">
             <label class="mdui-textfield-label">Username</label>
-            <input class="mdui-textfield-input" type="text" id="update-user-name"/>
+            <input class="mdui-textfield-input" type="text" id="update-user-name" pattern="[a-zA-Z0-9]+"/>
         </div>
         <div class="mdui-textfield">
             <label class="mdui-textfield-label">Password</label>
-            <input class="mdui-textfield-input" type="text" onkeyup='runtime.user.functions.checkPassword()' id="update-user-password"/>
+            <input class="mdui-textfield-input" type="password" onkeyup='runtime.user.functions.checkPassword()' id="update-user-password" pattern="[^' ']+"/>
         </div>
         <div class="mdui-textfield">
             <label class="mdui-textfield-label">Confirm Password</label>
-            <input class="mdui-textfield-input" type="text" onkeyup='runtime.user.functions.checkPassword()' id="confirm-user-password"/>
+            <input class="mdui-textfield-input" type="password" onkeyup='runtime.user.functions.checkPassword()' id="confirm-user-password" pattern="[^' ']+"/>
             <div class="mdui-textfield-error">Password mismatch</div>
         </div>
     </div>
     <div class="mdui-dialog-actions">
-      <button class="mdui-btn mdui-ripple" mdui-dialog-close>Cancel</button>
-      <button class="mdui-btn mdui-ripple" onclick="runtime.user.functions.updateUser()" mdui-dialog-close>Confirm</button>
+      <button class="mdui-btn mdui-ripple" onclick="runtime.misc.current_dialog.close()">Cancel</button>
+      <button class="mdui-btn mdui-ripple" onclick="runtime.user.functions.updateUser()">Confirm</button>
     </div>
 </div>
 <div class="mdui-dialog" id="user-settings" hss-permission="admin">
@@ -78,20 +81,23 @@
         </div>
         <div class="mdui-textfield">
             <label class="mdui-textfield-label">Username</label>
-            <input class="mdui-textfield-input" type="text" id="user-settings-name"/>
+            <input class="mdui-textfield-input" type="text" id="user-settings-name" pattern="[a-zA-Z0-9]+"/>
         </div>
         <div class="mdui-textfield">
             <label class="mdui-textfield-label">Password</label>
-            <input class="mdui-textfield-input" type="text" id="user-settings-password"/>
+            <input class="mdui-textfield-input" type="password" id="user-settings-password" pattern="[^' ']+"/>
         </div>
-        <div class="mdui-textfield">
-            <label class="mdui-textfield-label">Type</label>
-            <input class="mdui-textfield-input" type="text" id="user-settings-type"/>
+        <div class="mdui-textfield hss-overflow-visible">
+            <label class="mdui-checkbox">
+                <input type="checkbox"  id="user-settings-type"/>
+                <i class="mdui-checkbox-icon"></i>
+                Admin
+            </label>
         </div>
     </div>
     <div class="mdui-dialog-actions">
-      <button class="mdui-btn mdui-ripple" mdui-dialog-close>Cancel</button>
-      <button class="mdui-btn mdui-ripple" onclick="runtime.user.functions.updateUserFromAdmin()" mdui-dialog-close>Confirm</button>
+      <button class="mdui-btn mdui-ripple" onclick="runtime.misc.current_dialog.close()">Cancel</button>
+      <button class="mdui-btn mdui-ripple" onclick="runtime.user.functions.updateUserFromAdmin()">Confirm</button>
     </div>
 </div>
 <div class="mdui-dialog" id="user-deletion" hss-permission="admin">

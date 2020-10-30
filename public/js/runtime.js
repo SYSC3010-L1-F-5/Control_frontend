@@ -59,20 +59,14 @@ function permissionStyleToggle() {
     }
 }
 
-function checkUsernamePassword() {
-    username = document.getElementById("username").value
+function checkPasswordForLogin() {
     password = document.getElementById("password").value
-    if (!isEmptyOrNull(username)) {
-        document.getElementById("username").parentElement.classList.remove("mdui-textfield-invalid")
-    } else {
-        document.getElementById("username").parentElement.classList.add("mdui-textfield-invalid")
-    }
     if (!isEmptyOrNull(password)) {
         document.getElementById("password").parentElement.classList.remove("mdui-textfield-invalid")
     } else {
         document.getElementById("password").parentElement.classList.add("mdui-textfield-invalid")
     }
-    if (!isEmptyOrNull(username, password)) {
+    if (!isEmptyOrNull(password)) {
         return true
     } else {
         return false
@@ -144,15 +138,25 @@ function isEmptyOrNull() {
 }
 
 function detailsDialogForDevice() {
+    deviceIP = document.getElementById("device-settings-ip")
+    devicePort = document.getElementById("device-settings-port")
+    deviceZone = document.getElementById("device-settings-zone")
+    deviceType = document.getElementById("device-settings-type")
+    deviceName = document.getElementById("device-settings-name")
+    deviceIP.parentElement.classList.remove("mdui-textfield-invalid-html5")
+    devicePort.parentElement.classList.remove("mdui-textfield-invalid-html5")
+    deviceZone.parentElement.classList.remove("mdui-textfield-invalid-html5")
+    deviceType.parentElement.classList.remove("mdui-textfield-invalid-html5")
+    deviceName.parentElement.classList.remove("mdui-textfield-invalid-html5")
     document.getElementById("device-settings-uuid").innerText = arguments[0]
     document.getElementById("device-settings-key").innerText = arguments[1]
-    document.getElementById("device-settings-ip").value = arguments[2]
-    document.getElementById("device-settings-port").value = arguments[3]
-    document.getElementById("device-settings-zone").value = arguments[4]
-    document.getElementById("device-settings-type").value = arguments[5]
-    document.getElementById("device-settings-name").value = arguments[6]
-    var inst = new mdui.Dialog('#device-settings');
-    inst.open()
+    deviceIP.value = arguments[2]
+    devicePort.value = arguments[3]
+    deviceZone.value = arguments[4]
+    deviceType.value = arguments[5]
+    deviceName.value = arguments[6]
+    runtime.misc.current_dialog = new mdui.Dialog('#device-settings');
+    runtime.misc.current_dialog.open()
 }
 
 function deleteDialogForDevice() {
@@ -163,8 +167,28 @@ function deleteDialogForDevice() {
     document.getElementById("device-deletion-zone").innerText = arguments[4]
     document.getElementById("device-deletion-type").innerText = arguments[5]
     document.getElementById("device-deletion-name").innerText = arguments[6]
-    var inst = new mdui.Dialog('#device-deletion');
-    inst.open()
+    runtime.misc.current_dialog = new mdui.Dialog('#device-deletion');
+    runtime.misc.current_dialog.open()
+}
+
+function addDialogForDevice() {
+    deviceIP = document.getElementById("new-device-ip")
+    devicePort = document.getElementById("new-device-port")
+    deviceZone = document.getElementById("new-device-zone")
+    deviceType = document.getElementById("new-device-type")
+    deviceName = document.getElementById("new-device-name")
+    deviceIP.parentElement.classList.remove("mdui-textfield-invalid-html5")
+    devicePort.parentElement.classList.remove("mdui-textfield-invalid-html5")
+    deviceType.parentElement.classList.remove("mdui-textfield-invalid-html5")
+    deviceZone.parentElement.classList.remove("mdui-textfield-invalid-html5")
+    deviceName.parentElement.classList.remove("mdui-textfield-invalid-html5")
+    deviceIP.value = null
+    devicePort.value = null
+    deviceType.value = null
+    deviceZone.value = null
+    deviceName.value = null
+    runtime.misc.current_dialog = new mdui.Dialog('#device-add');
+    runtime.misc.current_dialog.open()
 }
 
 function renderDeviceForEvents(device, key) {
@@ -185,8 +209,8 @@ function detailsDialogForEvent() {
     }
     document.getElementById("event-settings-type").innerText = arguments[1]
     document.getElementById("event-settings-details").value = arguments[2]
-    var inst = new mdui.Dialog('#event-settings');
-    inst.open()
+    runtime.misc.current_dialog = new mdui.Dialog('#event-settings');
+    runtime.misc.current_dialog.open()
 }
 
 function deleteDialogForEvent() {
@@ -199,120 +223,433 @@ function deleteDialogForEvent() {
     }
     document.getElementById("event-deletion-type").innerText = arguments[1]
     document.getElementById("event-deletion-details").innerText = arguments[2]
-    var inst = new mdui.Dialog('#event-deletion');
-    inst.open()
+    runtime.misc.current_dialog = new mdui.Dialog('#event-deletion');
+    runtime.misc.current_dialog.open()
 }
 
 function detailsDialogForUser() {
     document.getElementById("user-settings-uuid").innerText = arguments[0]
-    document.getElementById("user-settings-name").value = arguments[1]
-    document.getElementById("user-settings-type").value = arguments[2]
-    var inst = new mdui.Dialog('#user-settings');
-    inst.open()
+    username = document.getElementById("user-settings-name")
+    password = document.getElementById("user-settings-password")
+    type = document.getElementById("user-settings-type")
+    username.parentElement.classList.remove("mdui-textfield-invalid-html5")
+    password.parentElement.classList.remove("mdui-textfield-invalid-html5")
+    username.value = arguments[1]
+    password.value = null
+    if (arguments[2] === "admin") {
+        type.checked = true
+    } else {
+        type.checked = false
+    }
+    runtime.misc.current_dialog = new mdui.Dialog('#user-settings');
+    runtime.misc.current_dialog.open()
+}
+
+function accountSettingsDialog() {
+    username = document.getElementById("update-user-name")
+    password = document.getElementById("update-user-password")
+    passwordConfirm = document.getElementById("confirm-user-password")
+    username.parentElement.classList.remove("mdui-textfield-invalid-html5")
+    password.parentElement.classList.remove("mdui-textfield-invalid-html5")
+    passwordConfirm.parentElement.classList.remove("mdui-textfield-invalid-html5")
+    username.value = runtime.user.details.username
+    password.value = null
+    passwordConfirm.value = null
+    runtime.misc.current_dialog = new mdui.Dialog('#account-settings');
+    runtime.misc.current_dialog.open()
 }
 
 function deleteDialogForUser() {
-    var inst = new mdui.Dialog('#user-deletion');
-    inst.open()
     document.getElementById("user-deletion-uuid").innerText = arguments[0]
     document.getElementById("user-deletion-name").innerText = arguments[1]
     document.getElementById("user-deletion-type").innerText = arguments[2]
+    runtime.misc.current_dialog = new mdui.Dialog('#user-deletion');
+    runtime.misc.current_dialog.open()
 }
 
-function getFieldsForUpdating() {
-    user_name = document.getElementById("update-user-name").value || null
-    user_password = document.getElementById("update-user-password").value || null
+function addDialogForUser() {
+    username = document.getElementById("new-user-name")
+    password = document.getElementById("new-user-password")
+    type = document.getElementById("new-user-type")
+    username.parentElement.classList.remove("mdui-textfield-invalid-html5")
+    password.parentElement.classList.remove("mdui-textfield-invalid-html5")
+    username.value = null
+    password.value = null
+    type.checked = false
+    runtime.misc.current_dialog = new mdui.Dialog('#user-add');
+    runtime.misc.current_dialog.open()
+}
+
+function getFieldsForUpdatingUser() {
+    username = document.getElementById("update-user-name")
+    password = document.getElementById("update-user-password")
     fields = {}
-    if (checkPassword()) {
-        if (!isEmptyOrNull(user_password)) {
-            fields.password = CryptoJS.MD5(user_password).toString()
+    invalidFields = []
+    if (username.parentElement.classList.contains("mdui-textfield-invalid-html5")) {
+        invalidFields.push("Username")
+        fields = null
+    } else {
+        if (!isEmptyOrNull(username.value) && fields !== null) {
+            fields.username = username.value
+        } else if (fields !== null) {
+            username.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Username")
+            fields = null
+        } else if (isEmptyOrNull(username.value)) {
+            username.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Details")
+            fields = null
         }
     }
-    if (!isEmptyOrNull(user_name)) {
-        fields.username = user_name
+    if (checkPasswordForUser()) {
+        if (password.parentElement.classList.contains("mdui-textfield-invalid-html5")) {
+            invalidFields.push("Password")
+            fields = null
+        } else {
+            if (!isEmptyOrNull(password.value) && fields !== null) {
+                fields.password = CryptoJS.MD5(password.value).toString()
+            }
+        }
     }
-    if (Object.keys(fields).length === 0) {
-        return null
+    
+    return {
+        fields,
+        invalidFields: invalidFields.join(", ")
     }
-    return fields
 }
 
-function getFieldsForUpdatingForAdmin() {
-    user_name = document.getElementById("user-settings-name").value || null
-    user_password = document.getElementById("user-settings-password").value || null
-    user_uuid = document.getElementById("user-settings-uuid").innerText || null
-    user_type = document.getElementById("user-settings-type").value || null
+function getFieldsForUpdatingUserForAdmin() {
+    username = document.getElementById("user-settings-name")
+    password = document.getElementById("user-settings-password")
+    type = document.getElementById("user-settings-type")
     fields = {}
-    if (!isEmptyOrNull(user_password)) {
-        fields.password = CryptoJS.MD5(user_password).toString()
+    invalidFields = []
+    if (username.parentElement.classList.contains("mdui-textfield-invalid-html5")) {
+        invalidFields.push("Username")
+        fields = null
+    } else {
+        if (!isEmptyOrNull(username.value) && fields !== null) {
+            fields.username = username.value
+        } else if (fields !== null) {
+            username.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Username")
+            fields = null
+        } else if (isEmptyOrNull(username.value)) {
+            username.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Details")
+            fields = null
+        }
     }
-    if (!isEmptyOrNull(user_name)) {
-        fields.username = user_name
+    if (password.parentElement.classList.contains("mdui-textfield-invalid-html5")) {
+        invalidFields.push("Password")
+        fields = null
+    } else {
+        if (password.parentElement.classList.contains("mdui-textfield-invalid-html5")) {
+            invalidFields.push("Password")
+            fields = null
+        } else {
+            if (!isEmptyOrNull(password.value) && fields !== null) {
+                fields.password = CryptoJS.MD5(password.value).toString()
+            }
+        }
     }
-    if (!isEmptyOrNull(user_uuid)) {
-        fields.uuid = user_uuid
+    if (fields !== null) {
+        if (type.checked) {
+            fields.type = "admin"
+        } else {
+            fields.type = "regular"
+        }
     }
-    if (!isEmptyOrNull(user_type)) {
-        fields.type = user_type
+    
+    return {
+        fields,
+        invalidFields: invalidFields.join(", ")
     }
-    if (Object.keys(fields).length === 0) {
-        return null
-    }
-    return fields
 }
 
 function getFieldsForUpdatingDevice() {
-    deviceIP = document.getElementById("device-settings-ip").value || null
-    devicePort = document.getElementById("device-settings-port").value || null
-    deviceZone = document.getElementById("device-settings-zone").value || null
-    deviceType = document.getElementById("device-settings-type").value || null
-    deviceName = document.getElementById("device-settings-name").value || null
+    deviceIP = document.getElementById("device-settings-ip")
+    devicePort = document.getElementById("device-settings-port")
+    deviceZone = document.getElementById("device-settings-zone")
+    deviceType = document.getElementById("device-settings-type")
+    deviceName = document.getElementById("device-settings-name")
     fields = {}
-    if (!isEmptyOrNull(deviceIP)) {
-        fields.ip = deviceIP
+    invalidFields = []
+    if (deviceIP.parentElement.classList.contains("mdui-textfield-invalid-html5")) {
+        invalidFields.push("IP")
+        fields = null
+    } else {
+        if (!isEmptyOrNull(deviceIP.value) && fields !== null) {
+            fields.ip = deviceIP.value
+        } else if (fields !== null) {
+            deviceIP.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("IP")
+            fields = null
+        } else if (isEmptyOrNull(deviceIP.value)) {
+            deviceIP.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("IP")
+            fields = null
+        }
     }
-    if (!isEmptyOrNull(devicePort)) {
-        fields.port = devicePort
+    if (devicePort.parentElement.classList.contains("mdui-textfield-invalid-html5")) {
+        invalidFields.push("Port")
+        fields = null
+    } else {
+        if (!isEmptyOrNull(devicePort.value) && fields !== null) {
+            fields.port = devicePort.value
+        } else if (fields !== null) {
+            devicePort.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Port")
+            fields = null
+        } else if (isEmptyOrNull(devicePort.value)) {
+            devicePort.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Port")
+            fields = null
+        }
     }
-    if (!isEmptyOrNull(deviceZone)) {
-        fields.zone = deviceZone
+    if (deviceZone.parentElement.classList.contains("mdui-textfield-invalid-html5")) {
+        invalidFields.push("Zone")
+        fields = null
+    } else {
+        if (!isEmptyOrNull(deviceZone.value) && fields !== null) {
+            fields.zone = deviceZone.value
+        } else if (fields !== null) {
+            deviceZone.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Zone")
+            fields = null
+        } else if (isEmptyOrNull(deviceZone.value)) {
+            deviceZone.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Zone")
+            fields = null
+        }
     }
-    if (!isEmptyOrNull(deviceType)) {
-        fields.type = deviceType
+    if (deviceType.parentElement.classList.contains("mdui-textfield-invalid-html5")) {
+        invalidFields.push("Type")
+        fields = null
+    } else {
+        if (!isEmptyOrNull(deviceType.value) && fields !== null) {
+            fields.type = deviceType.value
+        } else if (fields !== null) {
+            deviceType.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Type")
+            fields = null
+        } else if (isEmptyOrNull(deviceType.value)) {
+            deviceType.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Type")
+            fields = null
+        }
     }
-    if (!isEmptyOrNull(deviceName)) {
-        fields.name = deviceName
+    if (deviceName.parentElement.classList.contains("mdui-textfield-invalid-html5")) {
+        invalidFields.push("Name")
+        fields = null
+    } else {
+        if (!isEmptyOrNull(deviceName.value) && fields !== null) {
+            fields.name = deviceName.value
+        } else if (fields !== null) {
+            deviceName.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Name")
+            fields = null
+        } else if (isEmptyOrNull(deviceName.value)) {
+            deviceName.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Name")
+            fields = null
+        }
     }
-    if (Object.keys(fields).length === 0) {
-        return null
+    return {
+        fields,
+        invalidFields: invalidFields.join(", ")
     }
-    return fields
 }
 
 function getFieldsForUpdatingEvent() {
-    eventDetails = document.getElementById("event-settings-details").value || null
+    eventDetails = document.getElementById("event-settings-details")
     fields = {}
-    if (!isEmptyOrNull(eventDetails)) {
-        fields.what = eventDetails
+    invalidFields = []
+    if (eventDetails.parentElement.classList.contains("mdui-textfield-invalid-html5")) {
+        invalidFields.push("Details")
+        fields = null
+    } else {
+        if (!isEmptyOrNull(eventDetails.value) && fields !== null) {
+            fields.what = eventDetails.value
+        } else if (fields !== null) {
+            eventDetails.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Details")
+            fields = null
+        } else if (isEmptyOrNull(eventDetails.value)) {
+            eventDetails.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Details")
+            fields = null
+        }
     }
-    if (Object.keys(fields).length === 0) {
-        return null
+    return {
+        fields,
+        invalidFields: invalidFields.join(", ")
     }
-    return fields
 }
 
-function checkPassword() {
+function getFieldsForAddingDevice() {
+    deviceIP = document.getElementById("new-device-ip")
+    devicePort = document.getElementById("new-device-port")
+    deviceZone = document.getElementById("new-device-zone")
+    deviceType = document.getElementById("new-device-type")
+    deviceName = document.getElementById("new-device-name")
+    fields = {}
+    invalidFields = []
+    if (deviceIP.parentElement.classList.contains("mdui-textfield-invalid-html5")) {
+        invalidFields.push("IP")
+        fields = null
+    } else {
+        if (!isEmptyOrNull(deviceIP.value) && fields !== null) {
+            fields.ip = deviceIP.value
+        } else if (fields !== null) {
+            deviceIP.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("IP")
+            fields = null
+        } else if (isEmptyOrNull(deviceIP.value)) {
+            deviceIP.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("IP")
+            fields = null
+        }
+    }
+    if (devicePort.parentElement.classList.contains("mdui-textfield-invalid-html5")) {
+        invalidFields.push("Port")
+        fields = null
+    } else {
+        if (!isEmptyOrNull(devicePort.value) && fields !== null) {
+            fields.port = devicePort.value
+        } else if (fields !== null) {
+            devicePort.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Port")
+            fields = null
+        } else if (isEmptyOrNull(devicePort.value)) {
+            devicePort.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Port")
+            fields = null
+        }
+    }
+    if (deviceZone.parentElement.classList.contains("mdui-textfield-invalid-html5")) {
+        invalidFields.push("Zone")
+        fields = null
+    } else {
+        if (!isEmptyOrNull(deviceZone.value) && fields !== null) {
+            fields.zone = deviceZone.value
+        } else if (fields !== null) {
+            deviceZone.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Zone")
+            fields = null
+        } else if (isEmptyOrNull(deviceZone.value)) {
+            deviceZone.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Zone")
+            fields = null
+        }
+    }
+    if (deviceType.parentElement.classList.contains("mdui-textfield-invalid-html5")) {
+        invalidFields.push("Type")
+        fields = null
+    } else {
+        if (!isEmptyOrNull(deviceType.value) && fields !== null) {
+            fields.type = deviceType.value
+        } else if (fields !== null) {
+            deviceType.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Type")
+            fields = null
+        } else if (isEmptyOrNull(deviceType.value)) {
+            deviceType.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Type")
+            fields = null
+        }
+    }
+    if (deviceName.parentElement.classList.contains("mdui-textfield-invalid-html5")) {
+        invalidFields.push("Name")
+        fields = null
+    } else {
+        if (!isEmptyOrNull(deviceName.value) && fields !== null) {
+            fields.name = deviceName.value
+        } else if (fields !== null) {
+            deviceName.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Name")
+            fields = null
+        } else if (isEmptyOrNull(deviceName.value)) {
+            deviceName.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Name")
+            fields = null
+        }
+    }
+    return {
+        fields,
+        invalidFields: invalidFields.join(", ")
+    }
+}
+
+function getFieldsForAddingUser() {
+    username = document.getElementById("new-user-name")
+    password = document.getElementById("new-user-password")
+    type = document.getElementById("new-user-type")
+    fields = {}
+    invalidFields = []
+    if (username.parentElement.classList.contains("mdui-textfield-invalid-html5")) {
+        invalidFields.push("Username")
+        fields = null
+    } else {
+        if (!isEmptyOrNull(username.value) && fields !== null) {
+            fields.username = username.value
+        } else if (fields !== null) {
+            username.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Username")
+            fields = null
+        } else if (isEmptyOrNull(username.value)) {
+            username.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Details")
+            fields = null
+        }
+    }
+    if (password.parentElement.classList.contains("mdui-textfield-invalid-html5")) {
+        invalidFields.push("Password")
+        fields = null
+    } else {
+        if (!isEmptyOrNull(password.value) && fields !== null) {
+            fields.password = CryptoJS.MD5(password.value).toString()
+        } else if (fields !== null) {
+            password.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Password")
+            fields = null
+        } else if (isEmptyOrNull(password.value)) {
+            password.parentElement.classList.add("mdui-textfield-invalid-html5")
+            invalidFields.push("Password")
+            fields = null
+        }
+    }
+    if (fields !== null) {
+        if (type.checked) {
+            fields.type = "admin"
+        } else {
+            fields.type = "regular"
+        }
+    }
+    
+    return {
+        fields,
+        invalidFields: invalidFields.join(", ")
+    }
+}
+
+function checkPasswordForUser() {
     user_password = document.getElementById("update-user-password").value || null
     user_password_confirm = document.getElementById("confirm-user-password").value || null
     if (user_password !== user_password_confirm) {
-        document.getElementById("update-user-password").parentElement.classList.add("mdui-textfield-invalid")
-        document.getElementById("confirm-user-password").parentElement.classList.add("mdui-textfield-invalid")
+        document.getElementById("update-user-password").parentElement.classList.add("mdui-textfield-invalid-html5")
+        document.getElementById("confirm-user-password").parentElement.classList.add("mdui-textfield-invalid-html5")
         return false
     } else {
-        document.getElementById("update-user-password").parentElement.classList.remove("mdui-textfield-invalid")
-        document.getElementById("confirm-user-password").parentElement.classList.remove("mdui-textfield-invalid")
+        document.getElementById("update-user-password").parentElement.classList.remove("mdui-textfield-invalid-html5")
+        document.getElementById("confirm-user-password").parentElement.classList.remove("mdui-textfield-invalid-html5")
         return true
     }
+}
+
+function enterToLogin(e) {
+    if (!e) { var e = window.event; }
+    if (e.key === "Enter") { runtime.user.functions.tryAuthFromForm(); }
 }
 
 function authUser(userUUID) {
@@ -330,11 +667,11 @@ function authUser(userUUID) {
         if (isPerm === true) {
             localStorage.setItem("X-OTP", runtime.user.otp)
         }
-        console.log("go /")
         barba.go("/")
     })
     .catch(function (error) {
-        if (error.response !== undefined) {
+        document.getElementById("hss-loading-bar").classList.add("hss-hidden")
+        if (error.response === undefined) {
             errorDialog("Error", error)
             console.error(error)
         } else {
@@ -351,7 +688,7 @@ function authUser(userUUID) {
                     timeout: 2000
                 })
             } else {
-                errorDialog(error.response.status, error.response.text)
+                errorDialog(error.response.status, error.response.data.message)
             }
         }
     });
@@ -365,8 +702,24 @@ function tryAuthFromForm() {
     runtime.server.address = serverIP
     runtime.server.port = serverPort
     localStorage.setItem("server", JSON.stringify(runtime.server))
-    userUUID = calculateUUID()
-    authUser(userUUID)
+    username = document.getElementById("username")
+    password = document.getElementById("password")
+    if (!username.parentElement.classList.contains("mdui-textfield-invalid-html5") && !password.parentElement.classList.contains("mdui-textfield-invalid-html5")) {
+        if (!isEmptyOrNull(username.value, password.value)) {
+            userUUID = calculateUUID()
+            authUser(userUUID)
+        } else {
+            mdui.snackbar({
+                message: "Please enter your certificates",
+                timeout: 2000
+            })
+        }
+    } else {
+        mdui.snackbar({
+            message: "Invalid username and/or password",
+            timeout: 2000
+        })
+    }
 }
 
 function indexSetup() {
@@ -389,7 +742,8 @@ function logout() {
         return true
     })
     .catch(function (error) {
-        if (error.response !== undefined) {
+        document.getElementById("hss-loading-bar").classList.add("hss-hidden")
+        if (error.response === undefined) {
             errorDialog("Error", error)
             console.error(error)
         }  else if (error.response.status === 400) { 
@@ -398,7 +752,7 @@ function logout() {
                 timeout: 2000
             })
         } else {
-            errorDialog(error.response.status, error.response.text)
+            errorDialog(error.response.status, error.response.data.message)
         }
         toLogin()
         return false
@@ -443,7 +797,7 @@ function getDevices() {
     .catch(function (error) {
         progressBar.style.opacity = 1
         document.getElementById("device-list-refresh").removeAttribute("disabled")
-        if (error.response !== undefined) {
+        if (error.response === undefined) {
             errorDialog("Error", error)
             console.error(error)
         } else {
@@ -455,7 +809,7 @@ function getDevices() {
                     timeout: 2000
                 })
             } else {
-                errorDialog(error.response.status, error.response.text)
+                errorDialog(error.response.status, error.response.data.message)
             }
         }
         return false
@@ -501,7 +855,7 @@ function getEvents() {
     .catch(function (error) {
         progressBar.style.opacity = 0
         refreshButton.removeAttribute("disabled")
-        if (error.response !== undefined) {
+        if (error.response === undefined) {
             errorDialog("Error", error)
             console.error(error)
         } else {
@@ -513,7 +867,7 @@ function getEvents() {
                     timeout: 2000
                 })
             } else {
-                errorDialog(error.response.status, error.response.text)
+                errorDialog(error.response.status, error.response.data.message)
             }
         }
         return false
@@ -535,20 +889,20 @@ function getUser() {
         return true
     })
     .catch(function (error) {
-        if (error.response !== undefined) {
+        if (error.response === undefined) {
             errorDialog("Error", error)
             console.error(error)
         } else {
             if (error.response.status === 401) {
                 toLogin()
-            }  else if (error.response.status === 403 || error.response.status === 400) {
+            }  else if (error.response.status === 403) {
                 document.getElementById("user-loading").style.opacity = 0
                 mdui.snackbar({
                     message: error.response.data.message,
                     timeout: 2000
                 });
             } else {
-                errorDialog(error.response.status, error.response.text)
+                errorDialog(error.response.status, error.response.data.message)
             }
         }
         return false
@@ -591,19 +945,20 @@ function getUsers() {
     .catch(function (error) {
         progressBar.style.opacity = 0
         refreshButton.removeAttribute("disabled")
-        if (error.response !== undefined) {
+        if (error.response === undefined) {
             errorDialog("Error", error)
             console.error(error)
         } else {
             if (error.response.status === 401) {
                 toLogin()
-            } else if (error.response.status === 403 || error.response.status === 400) {
+            } else if (error.response.status === 403) {
                 document.getElementById("user-loading").style.opacity = 0
+                refreshButton.setAttribute("disabled", "")
                 mdui.snackbar({
                     message: error.response.data.message
                 });
             } else {
-                errorDialog(error.response.status, error.response.text)
+                errorDialog(error.response.status, error.response.data.message)
             }
         }
         return false
@@ -611,190 +966,223 @@ function getUsers() {
 }
 
 function updateUserFromAdmin() {
-    fields = getFieldsForUpdatingForAdmin()
+    data = getFieldsForUpdatingUserForAdmin()
+    fields = data.fields
+    invalidFields = data.invalidFields
     if (fields === null) {
         mdui.snackbar({
-            message: "All the fields are empty",
+            message: `Invalid field(s): ${invalidFields}`,
             timeout: 2000
         })
-    }
-    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
-    axios.put((serverAddr + '/user/update'), {
-        fields: JSON.stringify(fields)
-    }, {
-        headers: {
-            X_UUID: getUUID(),
-            X_OTP: getOTP()
-        }
-    })
-    .then(function (response) {
+    } else {
+        runtime.misc.current_dialog.close()
         mdui.snackbar({
-            message: response.data.message,
+            message: 'Updating the user account, please wait...',
             timeout: 2000
-        })
-        if (fields.username === runtime.user.details.username) {
-            toLogin()
-        } else {
-            runtime.user.functions.getUsers()
-        }
-        return true
-    })
-    .catch(function (error) {
-        if (error.response !== undefined) {
-            errorDialog("Error", error)
-            console.error(error)
-        } else {
-            if (error.response.status === 401) {
-                toLogin()
-            } else if (error.response.status === 403 || error.response.status === 400 || error.response.status === 404) {
-                mdui.snackbar({
-                    message: error.response.data.message,
-                    timeout: 2000
-                });
-            } else {
-                errorDialog(error.response.status, error.response.text)
+        });
+        fields.uuid = document.getElementById("user-settings-uuid").innerText
+        const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+        axios.put((serverAddr + '/user/update'), {
+            fields: JSON.stringify(fields)
+        }, {
+            headers: {
+                X_UUID: getUUID(),
+                X_OTP: getOTP()
             }
-        }
-        
-        return false
-    });
+        })
+        .then(function (response) {
+            mdui.snackbar({
+                message: response.data.message,
+                timeout: 2000
+            })
+            if (fields.username === runtime.user.details.username) {
+                toLogin()
+            } else {
+                runtime.user.functions.getUsers()
+            }
+            return true
+        })
+        .catch(function (error) {
+            if (error.response === undefined) {
+                errorDialog("Error", error)
+                console.error(error)
+            } else {
+                if (error.response.status === 401) {
+                    toLogin()
+                } else if (error.response.status === 403 || error.response.status === 404) {
+                    mdui.snackbar({
+                        message: error.response.data.message,
+                        timeout: 2000
+                    });
+                } else {
+                    errorDialog(error.response.status, error.response.data.message)
+                }
+            }
+            
+            return false
+        });
+    }
 }
 
 function updateUser() {
-    fields = getFieldsForUpdating()
+    data = getFieldsForUpdatingUser()
+    fields = data.fields
+    invalidFields = data.invalidFields
     if (fields === null) {
         mdui.snackbar({
-            message: "All the fields are empty",
+            message: `Invalid field(s): ${invalidFields}`,
             timeout: 2000
         })
-    }
-    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
-    axios.put((serverAddr + '/user/update'), {
-        fields: JSON.stringify(fields)
-    }, {
-        headers: {
-            X_UUID: getUUID(),
-            X_OTP: getOTP()
-        }
-    })
-    .then(function (response) {
+    } else {
+        runtime.misc.current_dialog.close()
         mdui.snackbar({
-            message: response.data.message,
+            message: 'Updating your account, please wait...',
             timeout: 2000
-        })
-        toLogin()
-        return true
-    })
-    .catch(function (error) {
-        if (error.response !== undefined) {
-            errorDialog("Error", error)
-            console.error(error)
-        } else {
-            if (error.response.status === 401) {
-                toLogin()
-            } else if (error.response.status === 403 || error.response.status === 400 || error.response.status === 404) {
-                mdui.snackbar({
-                    message: error.response.data.message,
-                    timeout: 2000
-                });
-            } else {
-                errorDialog(error.response.status, error.response.text)
+        });
+        const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+        axios.put((serverAddr + '/user/update'), {
+            fields: JSON.stringify(fields)
+        }, {
+            headers: {
+                X_UUID: getUUID(),
+                X_OTP: getOTP()
             }
-        }
-        return false
-    });
+        })
+        .then(function (response) {
+            mdui.snackbar({
+                message: response.data.message,
+                timeout: 2000
+            })
+            toLogin()
+            return true
+        })
+        .catch(function (error) {
+            if (error.response === undefined) {
+                errorDialog("Error", error)
+                console.error(error)
+            } else {
+                if (error.response.status === 401) {
+                    toLogin()
+                } else if (error.response.status === 403 || error.response.status === 404) {
+                    mdui.snackbar({
+                        message: error.response.data.message,
+                        timeout: 2000
+                    });
+                } else {
+                    errorDialog(error.response.status, error.response.data.message)
+                }
+            }
+            return false
+        });
+    }
 }
 
 function updateDevice() {
-    fields = getFieldsForUpdatingDevice()
+    data = getFieldsForUpdatingDevice()
+    fields = data.fields
+    invalidFields = data.invalidFields
     if (fields === null) {
         mdui.snackbar({
-            message: "All the fields are empty",
+            message: `Invalid field(s): ${invalidFields}`,
             timeout: 2000
         })
-    }
-    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
-    axios.put((serverAddr + '/device/update'), {
-        key: document.getElementById("device-settings-key").innerText,
-        fields: JSON.stringify(fields)
-    }, {
-        headers: {
-            X_UUID: getUUID(),
-            X_OTP: getOTP()
-        }
-    })
-    .then(function (response) {
+    } else {
+        runtime.misc.current_dialog.close()
         mdui.snackbar({
-            message: response.data.message,
+            message: "Updating a new device, please wait...",
             timeout: 2000
         })
-        runtime.devices.functions.getDevices()
-        return true
-    })
-    .catch(function (error) {
-        if (error.response !== undefined) {
-            errorDialog("Error", error)
-            console.error(error)
-        } else {
-            if (error.response.status === 401) {
-                toLogin()
-            } else if (error.response.status === 403 || error.response.status === 400 || error.response.status === 404) {
-                mdui.snackbar({
-                    message: error.response.data.message,
-                    timeout: 2000
-                });
-            } else {
-                errorDialog(error.response.status, error.response.text)
+        const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+        axios.put((serverAddr + '/device/update'), {
+            key: document.getElementById("device-settings-key").innerText,
+            fields: JSON.stringify(fields)
+        }, {
+            headers: {
+                X_UUID: getUUID(),
+                X_OTP: getOTP()
             }
-        }
-        return false
-    });
+        })
+        .then(function (response) {
+            mdui.snackbar({
+                message: `${response.data.message}`,
+                timeout: 2000
+            })
+            runtime.devices.functions.getDevices()
+            return true
+        })
+        .catch(function (error) {
+            if (error.response === undefined) {
+                errorDialog("Error", error)
+                console.error(error)
+            } else {
+                if (error.response.status === 401) {
+                    toLogin()
+                } else if (error.response.status === 403 || error.response.status === 404) {
+                    mdui.snackbar({
+                        message: error.response.data.message,
+                        timeout: 2000
+                    });
+                } else {
+                    errorDialog(error.response.status, error.response.data.message)
+                }
+            }
+            return false
+        });
+    }
 }
 
 function updateEvent() {
-    fields = getFieldsForUpdatingEvent()
+    data = getFieldsForUpdatingEvent()
+    fields = data.fields
+    invalidFields = data.invalidFields
     if (fields === null) {
         mdui.snackbar({
-            message: "All the fields are empty",
+            message: `Invalid field(s): ${invalidFields}`,
             timeout: 2000
         })
-    }
-    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
-    axios.put((serverAddr + '/event/update'), {
-        which: document.getElementById("event-settings-uuid").innerText,
-        fields: JSON.stringify(fields)
-    }, {
-        headers: {
-            X_UUID: getUUID(),
-            X_OTP: getOTP()
-        }
-    })
-    .then(function (response) {
+    } else {
+        runtime.misc.current_dialog.close()
         mdui.snackbar({
-            message: "Event is updated",
+            message: 'Updating the event, please wait...',
             timeout: 2000
-        })
-        runtime.events.functions.getEvents()
-        return true
-    })
-    .catch(function (error) {
-        if (error.response !== undefined) {
-            errorDialog("Error", error)
-            console.error(error)
-        } else {
-            if (error.response.status === 401) {
-                toLogin()
-            } else if (error.response.status === 403 || error.response.status === 400 || error.response.status === 404) {
-                mdui.snackbar({
-                    message: error.response.data.message,
-                    timeout: 2000
-                });
-            } else {
-                errorDialog(error.response.status, error.response.text)
+        });
+        const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+        axios.put((serverAddr + '/event/update'), {
+            which: document.getElementById("event-settings-uuid").innerText,
+            fields: JSON.stringify(fields)
+        }, {
+            headers: {
+                X_UUID: getUUID(),
+                X_OTP: getOTP()
             }
-        }
-        return false
-    });
+        })
+        .then(function (response) {
+            mdui.snackbar({
+                message: "Event is updated",
+                timeout: 2000
+            })
+            runtime.events.functions.getEvents()
+            return true
+        })
+        .catch(function (error) {
+            if (error.response === undefined) {
+                errorDialog("Error", error)
+                console.error(error)
+            } else {
+                if (error.response.status === 401) {
+                    toLogin()
+                } else if (error.response.status === 403 || error.response.status === 404) {
+                    mdui.snackbar({
+                        message: error.response.data.message,
+                        timeout: 2000
+                    });
+                } else {
+                    errorDialog(error.response.status, error.response.data.message)
+                }
+            }
+            return false
+        });
+    }
 }
 
 function deleteUser() {
@@ -849,19 +1237,19 @@ function deleteDevice() {
         return true
     })
     .catch(function (error) {
-        if (error.response !== undefined) {
+        if (error.response === undefined) {
             errorDialog("Error", error)
             console.error(error)
         } else {
             if (error.response.status === 401) {
                 toLogin()
-            } else if (error.response.status === 403 || error.response.status === 400 || error.response.status === 404) {
+            } else if (error.response.status === 403 || error.response.status === 404) {
                 mdui.snackbar({
                     message: error.response.data.message,
                     timeout: 2000
                 });
             } else {
-                errorDialog(error.response.status, error.response.text)
+                errorDialog(error.response.status, error.response.data.message)
             }
         }
         return false
@@ -889,19 +1277,19 @@ function deleteEvent() {
         return true
     })
     .catch(function (error) {
-        if (error.response !== undefined) {
+        if (error.response === undefined) {
             errorDialog("Error", error)
             console.error(error)
         } else {
             if (error.response.status === 401) {
                 toLogin()
-            } else if (error.response.status === 403 || error.response.status === 400 || error.response.status === 404) {
+            } else if (error.response.status === 403 || error.response.status === 404) {
                 mdui.snackbar({
                     message: error.response.data.message,
                     timeout: 2000
                 });
             } else {
-                errorDialog(error.response.status, error.response.text)
+                errorDialog(error.response.status, error.response.data.message)
             }
         }
         return false
@@ -924,14 +1312,14 @@ function pluginOff() {
         return true
     })
     .catch(function (error) {
-        if (error.response !== undefined) {
+        if (error.response === undefined) {
             errorDialog("Error", error)
             console.error(error)
         } else {
             if (error.response.status === 401) {
                 toLogin()
             } else {
-                errorDialog(error.response.status, error.response.text)
+                errorDialog(error.response.status, error.response.data.message)
             }
         }
         return false
@@ -939,94 +1327,111 @@ function pluginOff() {
 }
 
 function addDevice() {
-    mdui.snackbar({
-        message: 'Adding a new device, please wait...',
-        timeout: 2000
-    });
-    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
-    axios.post((serverAddr + '/device/add'), {
-        ip: document.getElementById("new-device-ip").value,
-        port: document.getElementById("new-device-port").value,
-        type: document.getElementById("new-device-type").value,
-        zone: document.getElementById("new-device-zone").value,
-        name: document.getElementById("new-device-name").value
-    },{
-        headers: {
-            X_UUID: getUUID(),
-            X_OTP: getOTP()
-        }
-    })
-    .then(function (response) {
-        document.getElementById("device-add-callback-key").innerText = response.data.message
-        new mdui.Dialog('#device-add-callback-dialog').open()
-        runtime.devices.functions.getDevices()
-        return true
-    })
-    .catch(function (error) {
-        if (error.response !== undefined) {
-            errorDialog("Error", error)
-            console.error(error)
-        } else {
-            if (error.response.status === 401) {
-                toLogin()
-            } else if (error.response.status === 403 || error.response.status === 400 || error.response.status === 404) {
-                mdui.snackbar({
-                    message: error.response.data.message,
-                    timeout: 2000
-                });
-            } else {
-                errorDialog(error.response.status, error.response.text)
+    data = getFieldsForAddingDevice()
+    fields = data.fields
+    invalidFields = data.invalidFields
+    if (fields === null) {
+        mdui.snackbar({
+            message: `Invalid field(s): ${invalidFields}`,
+            timeout: 2000
+        })
+    } else {
+        runtime.misc.current_dialog.close()
+        mdui.snackbar({
+            message: 'Adding a new device, please wait...',
+            timeout: 2000
+        });
+        const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+        axios.post((serverAddr + '/device/add'), {
+            ip: fields.ip,
+            port: fields.port,
+            type: fields.type,
+            zone: fields.zone,
+            name: fields.name
+        },{
+            headers: {
+                X_UUID: getUUID(),
+                X_OTP: getOTP()
             }
-        }
-        return false
-    });
+        })
+        .then(function (response) {
+            document.getElementById("device-add-callback-key").innerText = response.data.message
+            new mdui.Dialog('#device-add-callback-dialog').open()
+            runtime.devices.functions.getDevices()
+            return true
+        })
+        .catch(function (error) {
+            if (error.response === undefined) {
+                errorDialog("Error", error)
+                console.error(error)
+            } else {
+                if (error.response.status === 401) {
+                    toLogin()
+                } else if (error.response.status === 403 || error.response.status === 404) {
+                    mdui.snackbar({
+                        message: error.response.data.message,
+                        timeout: 2000
+                    });
+                } else {
+                    errorDialog(error.response.status, error.response.data.message)
+                }
+            }
+            return false
+        });
+    }
 }
 
 function addUser() {
-    mdui.snackbar({
-        message: 'Adding a new user, please wait...',
-        timeout: 2000
-    });
-    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
-    const fields = {
-        username: document.getElementById("new-user-name").value,
-        password: CryptoJS.MD5(document.getElementById("new-user-password").value).toString(),
-        type: document.getElementById("new-user-type").value
-    }
-    axios.post((serverAddr + '/user/add'), {
-        fields: JSON.stringify(fields)
-    },{
-        headers: {
-            X_UUID: getUUID(),
-            X_OTP: getOTP()
-        }
-    })
-    .then(function (response) {
+    data = getFieldsForAddingUser()
+    fields = data.fields
+    invalidFields = data.invalidFields
+    if (fields === null) {
         mdui.snackbar({
-            message: response.data.message,
+            message: `Invalid field(s): ${invalidFields}`,
             timeout: 2000
         })
-        runtime.user.functions.getUsers()
-        return true
-    })
-    .catch(function (error) {
-        if (error.response !== undefined) {
-            errorDialog("Error", error)
-            console.error(error)
-        } else {
-            if (error.response.status === 401) {
-                toLogin()
-            } else if (error.response.status === 403 || error.response.status === 400 || error.response.status === 404) {
-                mdui.snackbar({
-                    message: error.response.data.message,
-                    timeout: 2000
-                });
-            } else {
-                errorDialog(error.response.status, error.response.text)
+    } else {
+        runtime.misc.current_dialog.close()
+        mdui.snackbar({
+            message: 'Updating your account, please wait...',
+            timeout: 2000
+        });
+        const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+        axios.post((serverAddr + '/user/add'), {
+            fields: JSON.stringify(fields)
+        },{
+            headers: {
+                X_UUID: getUUID(),
+                X_OTP: getOTP()
             }
-        }
-        return false
-    });
+        })
+        .then(function (response) {
+            mdui.snackbar({
+                message: response.data.message,
+                timeout: 2000
+            })
+            runtime.user.functions.getUsers()
+            return true
+        })
+        .catch(function (error) {
+            if (error.response === undefined) {
+                errorDialog("Error", error)
+                console.error(error)
+            } else {
+                if (error.response.status === 401) {
+                    toLogin()
+                } else if (error.response.status === 404) {
+                    mdui.snackbar({
+                        message: error.response.data.message,
+                        timeout: 2000
+                    });
+                } else {
+                    errorDialog(error.response.status, error.response.data.message)
+                }
+            }
+            return false
+        });
+    }
 }
 
 window.runtime = {
@@ -1046,10 +1451,13 @@ window.runtime = {
             addUser,
             updateUser,
             deleteUser,
-            checkPassword,
+            checkPassword: checkPasswordForUser,
             detailsDialog: detailsDialogForUser,
             updateUserFromAdmin,
-            deleteDialog: deleteDialogForUser
+            deleteDialog: deleteDialogForUser,
+            accountSettingsDialog,
+            addDialogForUser,
+            enterToLogin
         }
     },
     devices: {
@@ -1059,7 +1467,8 @@ window.runtime = {
             deleteDevice,
             updateDevice,
             detailsDialog: detailsDialogForDevice,
-            deleteDialog: deleteDialogForDevice
+            deleteDialog: deleteDialogForDevice,
+            addDialog: addDialogForDevice
         }
     },
     events: {
@@ -1074,7 +1483,7 @@ window.runtime = {
     },
     misc: {
         functions: {
-            checkUsernamePassword,
+            checkPassword: checkPasswordForLogin,
             errorDialog
         }
     }

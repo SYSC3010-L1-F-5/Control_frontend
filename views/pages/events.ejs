@@ -42,12 +42,12 @@
       </div>
       <div class="mdui-textfield">
           <label class="mdui-textfield-label">Details</label>
-          <input class="mdui-textfield-input" type="text" id="event-settings-details"/>
+          <input class="mdui-textfield-input" type="text" id="event-settings-details" pattern="^[^\s]+.*$"/>
       </div>
   </div>
   <div class="mdui-dialog-actions">
-    <button class="mdui-btn mdui-ripple" mdui-dialog-close>Cancel</button>
-    <button class="mdui-btn mdui-ripple" onclick="runtime.events.functions.updateEvent()" mdui-dialog-close>Confirm</button>
+    <button class="mdui-btn mdui-ripple" onclick="runtime.misc.current_dialog.close()">Cancel</button>
+    <button class="mdui-btn mdui-ripple" onclick="runtime.events.functions.updateEvent()">Confirm</button>
   </div>
 </div>
 <div class="mdui-dialog" id="event-deletion" hss-permission="admin">

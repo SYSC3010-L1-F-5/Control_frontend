@@ -53,6 +53,7 @@ barba.init({
                 document.getElementById("logout-button").classList.add("hss-display-none")
                 document.getElementById("footer").classList.add("hss-display-none")
                 document.getElementById("hss-loading-bar").classList.add("hss-hidden")
+                document.getElementById("password").addEventListener("keydown", runtime.user.functions.enterToLogin, false);
             },
             afterEnter() {
                 runtime.server.init.loadServer()
@@ -79,4 +80,3 @@ barba.init({
 });
 runtime.versions.barba = barba.version
 runtime.server.init.loadServer()
-  
