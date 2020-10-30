@@ -40,5 +40,5 @@ app.get('/users', function (req, res) {
 
 app.use(express.static('public'));
 
-app.listen(8080);
+app.listen(8080, '0.0.0.0');
 console.log('8080 is the magic port');

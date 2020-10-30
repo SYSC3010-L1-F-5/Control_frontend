@@ -2,7 +2,8 @@
     <div class="mdui-card-primary">
         <div class="mdui-card-primary-title">
             Devices
-            <button class="mdui-btn mdui-ripple mdui-float-right" mdui-dialog="{target: '#device-add'}">Add</button>
+            <button class="mdui-btn mdui-ripple mdui-btn-icon mdui-float-right mdui-color-theme-accent hss-margin-left-8" onclick="runtime.devices.functions.getDevices()" mdui-tooltip="{content: 'Refresh'}" id="device-list-refresh" disabled><i class="mdui-icon material-icons">refresh</i></button>
+            <button class="mdui-btn mdui-ripple mdui-btn-icon mdui-float-right mdui-color-theme-accent" mdui-tooltip="{content: 'Add a new device'}" onclick="new mdui.Dialog('#device-add').open()" hss-permission="admin" disabled><i class="mdui-icon material-icons">add</i></button>
         </div>
     </div>
     <div class="mdui-progress" id="device-loading">
@@ -17,8 +18,9 @@
               <th>Zone</th>
               <th>Type</th>
               <th>Name</th>
-              <th>Pulse</th>
-              <th>Link</th>
+              <th>Last seen</th>
+              <th>Settings</th>
+              <th>Remove</th>
             </tr>
           </thead>
           <tbody id="devices-table-body">
@@ -52,6 +54,92 @@
     </div>
     <div class="mdui-dialog-actions">
       <button class="mdui-btn mdui-ripple" mdui-dialog-close>Cancel</button>
-      <button class="mdui-btn mdui-ripple" onclick="runtime.devices.functions.addDevice()">Confirm</button>
+      <button class="mdui-btn mdui-ripple" onclick="runtime.devices.functions.addDevice()" mdui-dialog-close>Confirm</button>
+    </div>
+</div>
+<div class="mdui-dialog" id="device-add-callback-dialog">
+    <div class="mdui-dialog-title">Device key</div>
+    <div class="mdui-dialog-content mdui-typo">
+        <pre id="device-add-callback-key"></pre>
+    </div>
+    <div class="mdui-dialog-actions">
+      <button class="mdui-btn mdui-ripple" mdui-dialog-close>Close</button>
+    </div>
+</div>
+<div class="mdui-dialog" id="device-settings" hss-permission="admin">
+    <div class="mdui-dialog-title">Device Settings</div>
+    <div class="mdui-dialog-content">
+        <div class="mdui-typo">
+            <label class="mdui-textfield-label">UUID</label>
+            <pre id="device-settings-uuid"></pre>
+        </div>
+        <div class="mdui-typo">
+            <label class="mdui-textfield-label">Access Key</label>
+            <pre id="device-settings-key"></pre>
+        </div>
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">IP</label>
+            <input class="mdui-textfield-input" type="text" id="device-settings-ip"/>
+        </div>
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">Port</label>
+            <input class="mdui-textfield-input" type="number" id="device-settings-port"/>
+        </div>
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">Zone</label>
+            <input class="mdui-textfield-input" type="text" id="device-settings-zone"/>
+        </div>
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">Type</label>
+            <input class="mdui-textfield-input" type="text" id="device-settings-type"/>
+        </div>
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">Name</label>
+            <input class="mdui-textfield-input" type="text" id="device-settings-name"/>
+        </div>
+    </div>
+    <div class="mdui-dialog-actions">
+      <button class="mdui-btn mdui-ripple" mdui-dialog-close>Cancel</button>
+      <button class="mdui-btn mdui-ripple" onclick="runtime.devices.functions.updateDevice()" mdui-dialog-close>Confirm</button>
+    </div>
+</div>
+<div class="mdui-dialog" id="device-deletion" hss-permission="admin">
+    <div class="mdui-dialog-title">
+        <div class="mdui-card-primary-title">Delete a Device</div>
+        <div class="mdui-card-primary-subtitle">There is no going back. Please be certain.</div>
+    </div>
+    <div class="mdui-dialog-content">
+        <div class="mdui-typo">
+            <label class="mdui-textfield-label">UUID</label>
+            <pre id="device-deletion-uuid"></pre>
+        </div>
+        <div class="mdui-typo">
+            <label class="mdui-textfield-label">Access Key</label>
+            <pre id="device-deletion-key"></pre>
+        </div>
+        <div class="mdui-typo">
+            <label class="mdui-textfield-label">IP</label>
+            <pre id="device-deletion-ip"></pre>
+        </div>
+        <div class="mdui-typo">
+            <label class="mdui-textfield-label">Port</label>
+            <pre id="device-deletion-port"></pre>
+        </div>
+        <div class="mdui-typo">
+            <label class="mdui-textfield-label">Zone</label>
+            <pre id="device-deletion-zone"></pre>
+        </div>
+        <div class="mdui-typo">
+            <label class="mdui-textfield-label">Type</label>
+            <pre id="device-deletion-type"></pre>
+        </div>
+        <div class="mdui-typo">
+            <label class="mdui-textfield-label">Name</label>
+            <pre id="device-deletion-name"></pre>
+        </div>
+    </div>
+    <div class="mdui-dialog-actions">
+      <button class="mdui-btn mdui-ripple" mdui-dialog-close>Cancel</button>
+      <button class="mdui-btn mdui-ripple" onclick="runtime.devices.functions.deleteDevice()" mdui-dialog-close>Confirm</button>
     </div>
 </div>

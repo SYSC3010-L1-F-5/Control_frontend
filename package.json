@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "nodemon ./app.js localhost 8080"
+    "dev": "nodemon ./app.js 0.0.0.0 8080"
   },
   "dependencies": {
     "ejs": "^3.1.5",

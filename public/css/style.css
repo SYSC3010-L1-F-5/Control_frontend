@@ -25,6 +25,23 @@ main {
     display: none;
 }
 
+.hss-hidden {
+    opacity: 0;
+    visibility: hidden
+}
+
+.hss-hidden-base {
+    transition: opacity .5s ease-in-out;
+}
+
+.hss-margin-left-8 {
+    margin-left: 8px;
+}
+
+.hss-overflow-visible {
+    overflow: visible;
+}
+
 .hss-shadow-0 {
     box-shadow: none;
 }

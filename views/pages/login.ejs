@@ -12,11 +12,11 @@
       </div>
       <div class="mdui-textfield">
         <label class="mdui-textfield-label" for="username">Username</label>
-        <input class="mdui-textfield-input" type="text" id="username" pattern="[a-zA-Z0-9]+"/>
+        <input class="mdui-textfield-input" type="text" id="username" pattern="[a-zA-Z0-9]+" onkeyup='runtime.misc.functions.checkUsernamePassword()'/>
       </div>
       <div class="mdui-textfield">
         <label class="mdui-textfield-label" for="password">Password</label>
-        <input class="mdui-textfield-input" type="password" id="password"  pattern="[^' ']+" />
+        <input class="mdui-textfield-input" type="password" id="password"  pattern="[^' ']+" onkeyup='runtime.misc.functions.checkUsernamePassword()'/>
       </div>
       <label class="mdui-list-item mdui-ripple">
         <div class="mdui-checkbox">

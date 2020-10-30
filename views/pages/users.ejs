@@ -2,7 +2,9 @@
     <div class="mdui-card-primary">
         <div class="mdui-card-primary-title">
             Users
-            <button class="mdui-btn mdui-ripple mdui-float-right" mdui-dialog="{target: '#user-add'}">Add</button>
+            <button class="mdui-btn mdui-ripple mdui-btn-icon mdui-color-theme-accent mdui-float-right hss-margin-left-8" mdui-dialog="{target: '#account-settings'}" mdui-tooltip="{content: 'Account Settings'}" onclick="document.getElementById('update-user-name').value=runtime.user.details.username"><i class="mdui-icon material-icons">settings</i></button>
+            <button class="mdui-btn mdui-ripple mdui-btn-icon mdui-float-right mdui-color-theme-accent hss-margin-left-8" onclick="runtime.user.functions.getUsers()" mdui-tooltip="{content: 'Refresh'}" hss-permission="admin" id="user-list-refresh" disabled><i class="mdui-icon material-icons">refresh</i></button>
+            <button class="mdui-btn mdui-ripple mdui-btn-icon mdui-color-theme-accent mdui-float-right" mdui-tooltip="{content: 'Add a new user'}" hss-permission="admin" disabled onclick="new mdui.Dialog('#user-add').open()"><i class="mdui-icon material-icons" disabled>add</i></button>
         </div>
     </div>
     <div class="mdui-progress" id="user-loading">
@@ -14,8 +16,9 @@
             <tr>
               <th>Username</th>
               <th>Type</th>
-              <th>Email</th>
-              <th>Link</th>
+              <th>Last Login</th>
+              <th>Settings</th>
+              <th>Delete</th>
             </tr>
           </thead>
           <tbody id="users-table-body">
@@ -41,6 +44,77 @@
     </div>
     <div class="mdui-dialog-actions">
       <button class="mdui-btn mdui-ripple" mdui-dialog-close>Cancel</button>
-      <button class="mdui-btn mdui-ripple" onclick="runtime.user.functions.addUser()">Confirm</button>
+      <button class="mdui-btn mdui-ripple" onclick="runtime.user.functions.addUser()" mdui-dialog-close>Confirm</button>
+    </div>
+</div>
+<div class="mdui-dialog" id="account-settings">
+    <div class="mdui-dialog-title">Account Settings</div>
+    <div class="mdui-dialog-content">
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">Username</label>
+            <input class="mdui-textfield-input" type="text" id="update-user-name"/>
+        </div>
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">Password</label>
+            <input class="mdui-textfield-input" type="text" onkeyup='runtime.user.functions.checkPassword()' id="update-user-password"/>
+        </div>
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">Confirm Password</label>
+            <input class="mdui-textfield-input" type="text" onkeyup='runtime.user.functions.checkPassword()' id="confirm-user-password"/>
+            <div class="mdui-textfield-error">Password mismatch</div>
+        </div>
+    </div>
+    <div class="mdui-dialog-actions">
+      <button class="mdui-btn mdui-ripple" mdui-dialog-close>Cancel</button>
+      <button class="mdui-btn mdui-ripple" onclick="runtime.user.functions.updateUser()" mdui-dialog-close>Confirm</button>
+    </div>
+</div>
+<div class="mdui-dialog" id="user-settings" hss-permission="admin">
+    <div class="mdui-dialog-title">User Settings</div>
+    <div class="mdui-dialog-content">
+        <div class="mdui-typo">
+            <label class="mdui-textfield-label">UUID</label>
+            <pre id="user-settings-uuid"></pre>
+        </div>
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">Username</label>
+            <input class="mdui-textfield-input" type="text" id="user-settings-name"/>
+        </div>
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">Password</label>
+            <input class="mdui-textfield-input" type="text" id="user-settings-password"/>
+        </div>
+        <div class="mdui-textfield">
+            <label class="mdui-textfield-label">Type</label>
+            <input class="mdui-textfield-input" type="text" id="user-settings-type"/>
+        </div>
+    </div>
+    <div class="mdui-dialog-actions">
+      <button class="mdui-btn mdui-ripple" mdui-dialog-close>Cancel</button>
+      <button class="mdui-btn mdui-ripple" onclick="runtime.user.functions.updateUserFromAdmin()" mdui-dialog-close>Confirm</button>
+    </div>
+</div>
+<div class="mdui-dialog" id="user-deletion" hss-permission="admin">
+    <div class="mdui-dialog-title">
+        <div class="mdui-card-primary-title">Delete a User</div>
+        <div class="mdui-card-primary-subtitle">There is no going back. Please be certain.</div>
+    </div>
+    <div class="mdui-dialog-content">
+        <div class="mdui-typo">
+            <label class="mdui-textfield-label">UUID</label>
+            <pre id="user-deletion-uuid"></pre>
+        </div>
+        <div class="mdui-typo">
+            <label class="mdui-textfield-label">Username</label>
+            <pre id="user-deletion-name"></pre>
+        </div>
+        <div class="mdui-typo">
+            <label class="mdui-textfield-label">Type</label>
+            <pre id="user-deletion-type"></pre>
+        </div>
+    </div>
+    <div class="mdui-dialog-actions">
+      <button class="mdui-btn mdui-ripple" mdui-dialog-close>Cancel</button>
+      <button class="mdui-btn mdui-ripple" onclick="runtime.user.functions.deleteUser()" mdui-dialog-close>Confirm</button>
     </div>
 </div>

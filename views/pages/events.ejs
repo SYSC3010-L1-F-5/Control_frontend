@@ -2,6 +2,7 @@
     <div class="mdui-card-primary">
         <div class="mdui-card-primary-title">
             Events
+            <button class="mdui-btn mdui-ripple mdui-btn-icon mdui-float-right mdui-color-theme-accent hss-margin-left-8" onclick="runtime.events.functions.getEvents()" mdui-tooltip="{content: 'Refresh'}" hss-permission="admin" id="event-list-refresh" disabled><i class="mdui-icon material-icons">refresh</i></button>
         </div>
     </div>
     <div class="mdui-progress" id="events-loading">
@@ -12,13 +13,68 @@
           <thead>
             <tr>
               <th>Time</th>
+              <th>Device</th>
               <th>Type</th>
               <th>Details</th>
-              <th>Link</th>
+              <th>Settings</th>
+              <th>Delete</th>
             </tr>
           </thead>
           <tbody id="events-table-body">
           </tbody>
         </table>
     </div>
+</div>
+<div class="mdui-dialog" id="event-settings" hss-permission="admin">
+  <div class="mdui-dialog-title">Event Settings</div>
+  <div class="mdui-dialog-content">
+      <div class="mdui-typo">
+          <label class="mdui-textfield-label">UUID</label>
+          <pre id="event-settings-uuid"></pre>
+      </div>
+      <div class="mdui-typo">
+        <label class="mdui-textfield-label">Device</label>
+        <pre id="event-settings-devices"></pre>
+      </div>
+      <div class="mdui-typo">
+        <label class="mdui-textfield-label">Type</label>
+        <pre id="event-settings-type"></pre>
+      </div>
+      <div class="mdui-textfield">
+          <label class="mdui-textfield-label">Details</label>
+          <input class="mdui-textfield-input" type="text" id="event-settings-details"/>
+      </div>
+  </div>
+  <div class="mdui-dialog-actions">
+    <button class="mdui-btn mdui-ripple" mdui-dialog-close>Cancel</button>
+    <button class="mdui-btn mdui-ripple" onclick="runtime.events.functions.updateEvent()" mdui-dialog-close>Confirm</button>
+  </div>
+</div>
+<div class="mdui-dialog" id="event-deletion" hss-permission="admin">
+  <div class="mdui-dialog-title">
+      <div class="mdui-card-primary-title">Delete a Event</div>
+      <div class="mdui-card-primary-subtitle">There is no going back. Please be certain.</div>
+  </div>
+  <div class="mdui-dialog-content">
+      <div class="mdui-typo">
+          <label class="mdui-textfield-label">UUID</label>
+          <pre id="event-deletion-uuid"></pre>
+      </div>
+      <div class="mdui-typo">
+        <label class="mdui-textfield-label">Device</label>
+        <pre id="event-deletion-devices"></pre>
+      </div>
+      <div class="mdui-typo">
+        <label class="mdui-textfield-label">Type</label>
+        <pre id="event-deletion-type"></pre>
+      </div>
+      <div class="mdui-typo">
+        <label class="mdui-textfield-label">Details</label>
+        <pre id="event-deletion-details"></pre>
+      </div>
+  </div>
+  <div class="mdui-dialog-actions">
+    <button class="mdui-btn mdui-ripple" mdui-dialog-close>Cancel</button>
+    <button class="mdui-btn mdui-ripple" onclick="runtime.events.functions.deleteEvent()" mdui-dialog-close>Confirm</button>
+  </div>
 </div>

@@ -1,6 +1,12 @@
-<header class="mdui-appbar mdui-appbar-fixed mdui-appbar-scroll-hide">
-  <div class="mdui-toolbar mdui-color-theme">
-    <a href="javascript:;" class="mdui-typo-headline">Home Surveillance System</a>
-    <div class="mdui-toolbar-spacer"></div>
-    <button class="mdui-btn mdui-btn-icon" onclick="runtime.user.functions.logout()" id="logout-button" mdui-tooltip="{content: 'Logout'}"><i class="mdui-icon material-icons">clear</i></button>
+<header>
+  <div class="mdui-appbar mdui-appbar-fixed mdui-appbar-scroll-hide mdui-shadow-0">
+    <div class="mdui-toolbar mdui-color-theme">
+      <a href="javascript:;" class="mdui-typo-headline">Home Surveillance System</a>
+      <div class="mdui-toolbar-spacer"></div>
+      <button class="mdui-btn mdui-btn-icon" onclick="runtime.user.functions.logout()" id="logout-button" mdui-tooltip="{content: 'Logout'}"><i class="mdui-icon material-icons">exit_to_app</i></button>
+    </div>
+  </div>
+  <div class="mdui-progress" id="hss-loading-bar">
+    <div class="mdui-progress-indeterminate"></div>
+  </div>
 </header>
