@@ -143,249 +143,6 @@ function isEmptyOrNull() {
     return isExists
 }
 
-function authUser(userUUID) {
-    document.getElementById("hss-loading-bar").classList.remove("hss-hidden")
-    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
-    const isPerm = document.getElementById("perm").checked
-    axios.post((serverAddr + '/user/login'), {}, {
-        headers: {
-            X_UUID: userUUID,
-            X_PERM: isPerm
-        }
-    })
-    .then(function (response) {
-        runtime.user.otp = response.data.message
-        if (isPerm === true) {
-            localStorage.setItem("X-OTP", runtime.user.otp)
-        }
-        console.log("go /")
-        barba.go("/")
-    })
-    .catch(function (error) {
-        console.log(error.response);
-        if (error.response.status === 401) {
-            document.getElementById("username").parentElement.classList.add("mdui-textfield-invalid")
-            document.getElementById("password").parentElement.classList.add("mdui-textfield-invalid")
-            mdui.snackbar({
-                message: error.response.data.message,
-                timeout: 2000
-            })
-        }
-        
-    });
-}
-
-function tryAuthFromForm() {
-    const serverAddr = document.getElementById("server_addr").value
-    const _temp = serverAddr.split(":")
-    const serverIP = _temp[0]
-    const serverPort = parseInt(_temp[1]) || 80
-    runtime.server.address = serverIP
-    runtime.server.port = serverPort
-    localStorage.setItem("server", JSON.stringify(runtime.server))
-    userUUID = calculateUUID()
-    authUser(userUUID)
-}
-
-function indexSetup() {
-    if (document.querySelector("main").getAttribute("data-barba-namespace") === "index") {
-        document.getElementById("index-username").innerText = ", " + runtime.user.details.username
-    }
-}
-
-function logout() {
-    document.getElementById("hss-loading-bar").classList.remove("hss-hidden")
-    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
-    axios.delete((serverAddr + '/user/logout'), {
-        headers: {
-            X_UUID: getUUID(),
-            X_OTP: getOTP()
-        }
-    })
-    .then(function (response) {
-        toLogin()
-        return true
-    })
-        .catch(function (error) {
-        console.error(error)
-        toLogin()
-        return false
-    });
-}
-
-function getDevices() {
-    var progressBar = document.getElementById("device-loading")
-    var tableBody = document.getElementById("devices-table-body")
-    var refreshButton = document.getElementById("device-list-refresh")
-    progressBar.style.opacity = 1
-    tableBody.innerHTML = ""
-    refreshButton.setAttribute("disabled", "")
-    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
-    axios.get((serverAddr + '/devices'), {
-        headers: {
-            X_UUID: getUUID(),
-            X_OTP: getOTP()
-        }
-    })
-    .then(function (response) {
-        progressBar.style.opacity = 0
-        runtime.devices.list = response.data.message
-        if (runtime.devices.list === null) {
-            mdui.snackbar({
-                message: "No device is added",
-                timeout: 2000
-            })
-        } else {
-            for (var i = 0; i < runtime.devices.list.length; i++) {
-                device = runtime.devices.list[i]
-                document.getElementById("devices-table-body").innerHTML += `<tr>
-                <td>${device.ip}</td><td>${device.port}</td><td>${device.zone}</td><td>${device.type}</td><td>${device.name}</td><td>${renderDate(device.pulse)}</td><td><button class="mdui-btn mdui-btn-icon mdui-color-theme-accent mdui-ripple" onclick="runtime.devices.functions.detailsDialog('${device.uuid}','${device.key}', '${device.ip}', '${device.port}', '${device.zone}','${device.type}','${device.name}')" hss-permission="admin" disabled><i class="mdui-icon material-icons">settings</i></button></td><td><button class="mdui-btn mdui-btn-icon mdui-color-theme-accent mdui-ripple" onclick="runtime.devices.functions.deleteDialog('${device.uuid}','${device.key}', '${device.ip}', '${device.port}', '${device.zone}','${device.type}','${device.name}')" hss-permission="admin" disabled><i class="mdui-icon material-icons">delete_forever</i></button></td></tr>`
-            }
-            if (runtime.user.details !== undefined) {
-                permissionStyleToggle()
-            }
-        }
-        refreshButton.removeAttribute("disabled")
-        return true
-    })
-    .catch(function (error) {
-        progressBar.style.opacity = 1
-        if (permissionCheck === true) {
-            document.getElementById("device-list-refresh").removeAttribute("disabled")
-        }
-        console.error(error.response)
-        if (error.response.status === 401) {
-            toLogin()
-        } else {
-            runtime.misc.functions.errorDialog(error.response.status, error.response.text)
-        }
-        return false
-    });
-}
-
-function getEvents() {
-    var progressBar = document.getElementById("events-loading")
-    var tableBody = document.getElementById("events-table-body")
-    var refreshButton = document.getElementById("event-list-refresh")
-    progressBar.style.opacity = 1
-    tableBody.innerHTML = ""
-    refreshButton.setAttribute("disabled", "")
-    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
-    axios.get((serverAddr + '/events'), {
-        headers: {
-            X_UUID: getUUID(),
-            X_OTP: getOTP()
-        }
-    })
-    .then(function (response) {
-        progressBar.style.opacity = 0
-        runtime.events.list = response.data.message
-        runtime.events.device_lut = {}
-        if (runtime.events.list === null) {
-            mdui.snackbar({
-                message: "No event is received",
-                timeout: 2000
-            })
-        } else {
-            for (var i = 0; i < runtime.events.list.length; i++) {
-                eventDetails = runtime.events.list[i]
-                document.getElementById("events-table-body").innerHTML += `<tr><td>${renderDate(eventDetails.time)}</td><td>${eventDetails.device.zone}:${eventDetails.device.type}:${eventDetails.device.name}</td><td>${eventDetails.type}</td><td>${eventDetails.details}</td><td><button class="mdui-btn mdui-btn-icon mdui-color-theme-accent mdui-ripple" onclick="runtime.events.functions.detailsDialog('${eventDetails.uuid}', '${eventDetails.type}', '${eventDetails.details}')" hss-permission="admin" disabled><i class="mdui-icon material-icons">settings</i></button></td><td><button class="mdui-btn mdui-btn-icon mdui-color-theme-accent mdui-ripple" onclick="runtime.events.functions.deleteDialog('${eventDetails.uuid}', '${eventDetails.type}', '${eventDetails.details}')" hss-permission="admin" disabled><i class="mdui-icon material-icons">delete_forever</i></button></td></tr>`
-                runtime.events.device_lut[eventDetails.uuid] = eventDetails.device
-            }
-            if (runtime.user.details !== undefined) {
-                permissionStyleToggle()
-            }
-        }
-        refreshButton.removeAttribute("disabled")
-        return true
-    })
-    .catch(function (error) {
-        progressBar.style.opacity = 0
-        refreshButton.removeAttribute("disabled")
-        console.log(error)
-        if (error.response.status === 401) {
-            toLogin()
-        } else {
-            runtime.misc.functions.errorDialog(error.response.status, error.response.text)
-        }
-        return false
-    });
-}
-
-function getUser() {
-    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
-    axios.get((serverAddr + '/user'), {
-        headers: {
-            X_UUID: getUUID(),
-            X_OTP: getOTP()
-        }
-    })
-    .then(function (response) {
-        runtime.user.details = response.data.message
-        indexSetup()
-        permissionStyleToggle()
-        return true
-    })
-    .catch(function (error) {
-        console.log(error)
-        if (error.response.status === 401) {
-            toLogin()
-        } else {
-            runtime.misc.functions.errorDialog(error.response.status, error.response.text)
-        }
-        return false
-    });
-}
-
-function getUsers() {
-    var progressBar = document.getElementById("user-loading")
-    var tableBody = document.getElementById("users-table-body")
-    var refreshButton = document.getElementById("user-list-refresh")
-    progressBar.style.opacity = 1
-    tableBody.innerHTML = ""
-    refreshButton.setAttribute("disabled", "")
-    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
-    axios.get((serverAddr + '/users'), {
-        headers: {
-            X_UUID: getUUID(),
-            X_OTP: getOTP()
-        }
-    })
-    .then(function (response) {
-        progressBar.style.opacity = 0
-        runtime.user.list = response.data.message
-        if (runtime.user.list === null) {
-            runtime.misc.functions.errorDialog("No user detail received", "The system has no user added, please add user first") // impossible
-        } else {
-            for (var i = 0; i < runtime.user.list.length; i++) {
-                user = runtime.user.list[i]
-                tableBody.innerHTML += `<tr><td>${user.username}</td><td>${user.type}</td><td>${renderDate(user.last_login)}</td><td><button class="mdui-btn mdui-btn-icon mdui-color-theme-accent mdui-ripple" onclick="runtime.user.functions.detailsDialog('${user.uuid}', '${user.username}', '${user.type}')"><i class="mdui-icon material-icons">settings</i></button></td><td><button class="mdui-btn mdui-btn-icon mdui-color-theme-accent mdui-ripple" onclick="runtime.user.functions.deleteDialog('${user.uuid}', '${user.username}', '${user.type}')"><i class="mdui-icon material-icons">delete_forever</i></button></td></tr>`
-            }
-            if (runtime.user.details !== undefined) {
-                permissionStyleToggle()
-            }
-        }
-        refreshButton.removeAttribute("disabled")
-        return true
-    })
-    .catch(function (error) {
-        progressBar.style.opacity = 0
-        refreshButton.removeAttribute("disabled")
-        console.log(error)
-        if (error.response.status === 401) {
-            toLogin()
-        } else if (error.response.status === 403) {
-            document.getElementById("user-loading").style.opacity = 0
-            mdui.snackbar({
-                message: `${error.response.status}: ${error.response.data.message}`
-            });
-        }  else {
-            runtime.misc.functions.errorDialog(error.response.status, error.response.text)
-        }
-        return false
-    });
-}
-
 function detailsDialogForDevice() {
     document.getElementById("device-settings-uuid").innerText = arguments[0]
     document.getElementById("device-settings-key").innerText = arguments[1]
@@ -410,10 +167,22 @@ function deleteDialogForDevice() {
     inst.open()
 }
 
+function renderDeviceForEvents(device, key) {
+    if (device === null) {
+        return "Unknown"
+    } else {
+        return device[key]
+    }
+}
+
 function detailsDialogForEvent() {
     document.getElementById("event-settings-uuid").innerText = arguments[0]
     device = runtime.events.device_lut[arguments[0]]
-    document.getElementById("event-settings-devices").innerHTML = `<div><b>Zone: </b>${device.zone}</div><div><b>Type: </b>${device.type}</div><div><b>Name: </b>${device.name}</div>`
+    if (device === null) {
+        document.getElementById("event-settings-devices").innerHTML = "Unknown"
+    } else {
+        document.getElementById("event-settings-devices").innerHTML = `<div><b>Zone: </b>${device.zone}</div><div><b>Type: </b>${device.type}</div><div><b>Name: </b>${device.name}</div>`
+    }
     document.getElementById("event-settings-type").innerText = arguments[1]
     document.getElementById("event-settings-details").value = arguments[2]
     var inst = new mdui.Dialog('#event-settings');
@@ -423,7 +192,11 @@ function detailsDialogForEvent() {
 function deleteDialogForEvent() {
     document.getElementById("event-deletion-uuid").innerText = arguments[0]
     device = runtime.events.device_lut[arguments[0]]
-    document.getElementById("event-deletion-devices").innerHTML = `<div><b>Zone: </b>${device.zone}</div><div><b>Type: </b>${device.type}</div><div><b>Name: </b>${device.name}</div>`
+    if (device === null) {
+        document.getElementById("event-deletion-devices").innerHTML = "Unknown"
+    } else {
+        document.getElementById("event-deletion-devices").innerHTML = `<div><b>Zone: </b>${device.zone}</div><div><b>Type: </b>${device.type}</div><div><b>Name: </b>${device.name}</div>`
+    }
     document.getElementById("event-deletion-type").innerText = arguments[1]
     document.getElementById("event-deletion-details").innerText = arguments[2]
     var inst = new mdui.Dialog('#event-deletion');
@@ -444,225 +217,6 @@ function deleteDialogForUser() {
     document.getElementById("user-deletion-uuid").innerText = arguments[0]
     document.getElementById("user-deletion-name").innerText = arguments[1]
     document.getElementById("user-deletion-type").innerText = arguments[2]
-}
-
-function updateUserFromAdmin() {
-    fields = getFieldsForUpdatingForAdmin()
-    if (fields === null) {
-        mdui.snackbar({
-            message: "All the fields are empty",
-            timeout: 2000
-        })
-    }
-    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
-    axios.put((serverAddr + '/user/update'), {
-        fields: JSON.stringify(fields)
-    }, {
-        headers: {
-            X_UUID: getUUID(),
-            X_OTP: getOTP()
-        }
-    })
-    .then(function (response) {
-        mdui.snackbar({
-            message: response.data.message,
-            timeout: 2000
-        })
-        if (fields.username === runtime.user.details.username) {
-            toLogin()
-        } else {
-            runtime.user.functions.getUsers()
-        }
-        return true
-    })
-    .catch(function (error) {
-        console.log(error)
-        
-        return false
-    });
-}
-
-function updateUser() {
-    fields = getFieldsForUpdating()
-    if (fields === null) {
-        mdui.snackbar({
-            message: "All the fields are empty",
-            timeout: 2000
-        })
-    }
-    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
-    axios.put((serverAddr + '/user/update'), {
-        fields: JSON.stringify(fields)
-    }, {
-        headers: {
-            X_UUID: getUUID(),
-            X_OTP: getOTP()
-        }
-    })
-    .then(function (response) {
-        mdui.snackbar({
-            message: response.data.message,
-            timeout: 2000
-        })
-        toLogin()
-        return true
-    })
-    .catch(function (error) {
-        console.log(error)
-        
-        return false
-    });
-}
-
-function updateDevice() {
-    fields = getFieldsForUpdatingDevice()
-    if (fields === null) {
-        mdui.snackbar({
-            message: "All the fields are empty",
-            timeout: 2000
-        })
-    }
-    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
-    axios.put((serverAddr + '/device/update'), {
-        key: document.getElementById("device-settings-key").innerText,
-        fields: JSON.stringify(fields)
-    }, {
-        headers: {
-            X_UUID: getUUID(),
-            X_OTP: getOTP()
-        }
-    })
-    .then(function (response) {
-        mdui.snackbar({
-            message: response.data.message,
-            timeout: 2000
-        })
-        runtime.devices.functions.getDevices()
-        return true
-    })
-    .catch(function (error) {
-        console.log(error)
-        
-        return false
-    });
-}
-
-function updateEvent() {
-    fields = getFieldsForUpdatingEvent()
-    if (fields === null) {
-        mdui.snackbar({
-            message: "All the fields are empty",
-            timeout: 2000
-        })
-    }
-    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
-    axios.put((serverAddr + '/event/update'), {
-        which: document.getElementById("event-settings-uuid").innerText,
-        fields: JSON.stringify(fields)
-    }, {
-        headers: {
-            X_UUID: getUUID(),
-            X_OTP: getOTP()
-        }
-    })
-    .then(function (response) {
-        mdui.snackbar({
-            message: "Event is updated",
-            timeout: 2000
-        })
-        runtime.events.functions.getEvents()
-        return true
-    })
-    .catch(function (error) {
-        console.log(error)
-        
-        return false
-    });
-}
-
-function deleteUser() {
-    const uuid = document.getElementById("user-deletion-uuid").innerText
-    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
-    axios.delete((serverAddr + '/user/delete'), {
-        headers: {
-            X_UUID: getUUID(),
-            X_OTP: getOTP()
-        },
-        data: {
-            uuid
-        }
-    })
-    .then(function (response) {
-        mdui.snackbar({
-            message: response.data.message,
-            timeout: 2000
-        })
-        if (uuid === runtime.user.details.uuid) {
-            toLogin()
-        } else {
-            runtime.user.functions.getUsers()
-        }
-        return true
-    })
-    .catch(function (error) {
-        console.log(error)
-        
-        return false
-    });
-}
-
-function deleteDevice() {
-    const key = document.getElementById("device-deletion-key").innerText
-    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
-    axios.delete((serverAddr + '/device/delete'), {
-        headers: {
-            X_UUID: getUUID(),
-            X_OTP: getOTP()
-        },
-        data: {
-            key
-        }
-    })
-    .then(function (response) {
-        mdui.snackbar({
-            message: response.data.message,
-            timeout: 2000
-        })
-        runtime.devices.functions.getDevices()
-        return true
-    })
-    .catch(function (error) {
-        console.log(error)
-        
-        return false
-    });
-}
-
-function deleteEvent() {
-    const uuid = document.getElementById("event-deletion-uuid").innerText
-    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
-    axios.delete((serverAddr + '/event/delete'), {
-        headers: {
-            X_UUID: getUUID(),
-            X_OTP: getOTP()
-        },
-        data: {
-            which: uuid
-        }
-    })
-    .then(function (response) {
-        mdui.snackbar({
-            message: response.data.message,
-            timeout: 2000
-        })
-        runtime.events.functions.getEvents()
-        return true
-    })
-    .catch(function (error) {
-        console.log(error)
-        
-        return false
-    });
 }
 
 function getFieldsForUpdating() {
@@ -761,6 +315,599 @@ function checkPassword() {
     }
 }
 
+function authUser(userUUID) {
+    document.getElementById("hss-loading-bar").classList.remove("hss-hidden")
+    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+    const isPerm = document.getElementById("perm").checked
+    axios.post((serverAddr + '/user/login'), {}, {
+        headers: {
+            X_UUID: userUUID,
+            X_PERM: isPerm
+        }
+    })
+    .then(function (response) {
+        runtime.user.otp = response.data.message
+        if (isPerm === true) {
+            localStorage.setItem("X-OTP", runtime.user.otp)
+        }
+        console.log("go /")
+        barba.go("/")
+    })
+    .catch(function (error) {
+        if (error.response !== undefined) {
+            errorDialog("Error", error)
+            console.error(error)
+        } else {
+            if (error.response.status === 401) {
+                document.getElementById("username").parentElement.classList.add("mdui-textfield-invalid")
+                document.getElementById("password").parentElement.classList.add("mdui-textfield-invalid")
+                mdui.snackbar({
+                    message: error.response.data.message,
+                    timeout: 2000
+                })
+            } else if (error.response.status === 400) { 
+                mdui.snackbar({
+                    message: error.response.data.message,
+                    timeout: 2000
+                })
+            } else {
+                errorDialog(error.response.status, error.response.text)
+            }
+        }
+    });
+}
+
+function tryAuthFromForm() {
+    const serverAddr = document.getElementById("server_addr").value
+    const _temp = serverAddr.split(":")
+    const serverIP = _temp[0]
+    const serverPort = parseInt(_temp[1]) || 80
+    runtime.server.address = serverIP
+    runtime.server.port = serverPort
+    localStorage.setItem("server", JSON.stringify(runtime.server))
+    userUUID = calculateUUID()
+    authUser(userUUID)
+}
+
+function indexSetup() {
+    if (document.querySelector("main").getAttribute("data-barba-namespace") === "index") {
+        document.getElementById("index-username").innerText = ", " + runtime.user.details.username
+    }
+}
+
+function logout() {
+    document.getElementById("hss-loading-bar").classList.remove("hss-hidden")
+    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+    axios.delete((serverAddr + '/user/logout'), {
+        headers: {
+            X_UUID: getUUID(),
+            X_OTP: getOTP()
+        }
+    })
+    .then(function (response) {
+        toLogin()
+        return true
+    })
+    .catch(function (error) {
+        if (error.response !== undefined) {
+            errorDialog("Error", error)
+            console.error(error)
+        }  else if (error.response.status === 400) { 
+            mdui.snackbar({
+                message: error.response.data.message,
+                timeout: 2000
+            })
+        } else {
+            errorDialog(error.response.status, error.response.text)
+        }
+        toLogin()
+        return false
+    });
+}
+
+function getDevices() {
+    var progressBar = document.getElementById("device-loading")
+    var tableBody = document.getElementById("devices-table-body")
+    var refreshButton = document.getElementById("device-list-refresh")
+    progressBar.style.opacity = 1
+    tableBody.innerHTML = ""
+    refreshButton.setAttribute("disabled", "")
+    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+    axios.get((serverAddr + '/devices'), {
+        headers: {
+            X_UUID: getUUID(),
+            X_OTP: getOTP()
+        }
+    })
+    .then(function (response) {
+        progressBar.style.opacity = 0
+        runtime.devices.list = response.data.message
+        if (runtime.devices.list === null) {
+            mdui.snackbar({
+                message: "No device is added",
+                timeout: 2000
+            })
+        } else {
+            for (var i = 0; i < runtime.devices.list.length; i++) {
+                device = runtime.devices.list[i]
+                document.getElementById("devices-table-body").innerHTML += `<tr>
+                <td>${device.ip}</td><td>${device.port}</td><td>${device.zone}</td><td>${device.type}</td><td>${device.name}</td><td>${renderDate(device.pulse)}</td><td><button class="mdui-btn mdui-btn-icon mdui-color-theme-accent mdui-ripple" onclick="runtime.devices.functions.detailsDialog('${device.uuid}','${device.key}', '${device.ip}', '${device.port}', '${device.zone}','${device.type}','${device.name}')" hss-permission="admin" disabled><i class="mdui-icon material-icons">settings</i></button></td><td><button class="mdui-btn mdui-btn-icon mdui-color-theme-accent mdui-ripple" onclick="runtime.devices.functions.deleteDialog('${device.uuid}','${device.key}', '${device.ip}', '${device.port}', '${device.zone}','${device.type}','${device.name}')" hss-permission="admin" disabled><i class="mdui-icon material-icons">delete_forever</i></button></td></tr>`
+            }
+            if (runtime.user.details !== undefined) {
+                permissionStyleToggle()
+            }
+        }
+        refreshButton.removeAttribute("disabled")
+        return true
+    })
+    .catch(function (error) {
+        progressBar.style.opacity = 1
+        document.getElementById("device-list-refresh").removeAttribute("disabled")
+        if (error.response !== undefined) {
+            errorDialog("Error", error)
+            console.error(error)
+        } else {
+            if (error.response.status === 401) {
+                toLogin()
+            } else if (error.response.status === 400) { 
+                mdui.snackbar({
+                    message: error.response.data.message,
+                    timeout: 2000
+                })
+            } else {
+                errorDialog(error.response.status, error.response.text)
+            }
+        }
+        return false
+    });
+}
+
+function getEvents() {
+    var progressBar = document.getElementById("events-loading")
+    var tableBody = document.getElementById("events-table-body")
+    var refreshButton = document.getElementById("event-list-refresh")
+    progressBar.style.opacity = 1
+    tableBody.innerHTML = ""
+    refreshButton.setAttribute("disabled", "")
+    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+    axios.get((serverAddr + '/events'), {
+        headers: {
+            X_UUID: getUUID(),
+            X_OTP: getOTP()
+        }
+    })
+    .then(function (response) {
+        progressBar.style.opacity = 0
+        runtime.events.list = response.data.message
+        runtime.events.device_lut = {}
+        if (runtime.events.list === null) {
+            mdui.snackbar({
+                message: "No event is received",
+                timeout: 2000
+            })
+        } else {
+            for (var i = 0; i < runtime.events.list.length; i++) {
+                eventDetails = runtime.events.list[i]
+                document.getElementById("events-table-body").innerHTML += `<tr><td>${renderDate(eventDetails.time)}</td><td>${renderDeviceForEvents(eventDetails.device, "zone")} - ${renderDeviceForEvents(eventDetails.device, "type")} - ${renderDeviceForEvents(eventDetails.device, "name")}</td><td>${eventDetails.type}</td><td>${eventDetails.details}</td><td><button class="mdui-btn mdui-btn-icon mdui-color-theme-accent mdui-ripple" onclick="runtime.events.functions.detailsDialog('${eventDetails.uuid}', '${eventDetails.type}', '${eventDetails.details}')" hss-permission="admin" disabled><i class="mdui-icon material-icons">settings</i></button></td><td><button class="mdui-btn mdui-btn-icon mdui-color-theme-accent mdui-ripple" onclick="runtime.events.functions.deleteDialog('${eventDetails.uuid}', '${eventDetails.type}', '${eventDetails.details}')" hss-permission="admin" disabled><i class="mdui-icon material-icons">delete_forever</i></button></td></tr>`
+                runtime.events.device_lut[eventDetails.uuid] = eventDetails.device
+            }
+            if (runtime.user.details !== undefined) {
+                permissionStyleToggle()
+            }
+        }
+        refreshButton.removeAttribute("disabled")
+        return true
+    })
+    .catch(function (error) {
+        progressBar.style.opacity = 0
+        refreshButton.removeAttribute("disabled")
+        if (error.response !== undefined) {
+            errorDialog("Error", error)
+            console.error(error)
+        } else {
+            if (error.response.status === 401) {
+                toLogin()
+            } else if (error.response.status === 400) { 
+                mdui.snackbar({
+                    message: error.response.data.message,
+                    timeout: 2000
+                })
+            } else {
+                errorDialog(error.response.status, error.response.text)
+            }
+        }
+        return false
+    });
+}
+
+function getUser() {
+    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+    axios.get((serverAddr + '/user'), {
+        headers: {
+            X_UUID: getUUID(),
+            X_OTP: getOTP()
+        }
+    })
+    .then(function (response) {
+        runtime.user.details = response.data.message
+        indexSetup()
+        permissionStyleToggle()
+        return true
+    })
+    .catch(function (error) {
+        if (error.response !== undefined) {
+            errorDialog("Error", error)
+            console.error(error)
+        } else {
+            if (error.response.status === 401) {
+                toLogin()
+            }  else if (error.response.status === 403 || error.response.status === 400) {
+                document.getElementById("user-loading").style.opacity = 0
+                mdui.snackbar({
+                    message: error.response.data.message,
+                    timeout: 2000
+                });
+            } else {
+                errorDialog(error.response.status, error.response.text)
+            }
+        }
+        return false
+    });
+}
+
+function getUsers() {
+    var progressBar = document.getElementById("user-loading")
+    var tableBody = document.getElementById("users-table-body")
+    var refreshButton = document.getElementById("user-list-refresh")
+    progressBar.style.opacity = 1
+    tableBody.innerHTML = ""
+    refreshButton.setAttribute("disabled", "")
+    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+    axios.get((serverAddr + '/users'), {
+        headers: {
+            X_UUID: getUUID(),
+            X_OTP: getOTP()
+        }
+    })
+    .then(function (response) {
+        progressBar.style.opacity = 0
+        runtime.user.list = response.data.message
+        if (runtime.user.list === null) {
+            mdui.snackbar({
+                message: "The system has no user added, please add user first"
+            })
+        } else {
+            for (var i = 0; i < runtime.user.list.length; i++) {
+                user = runtime.user.list[i]
+                tableBody.innerHTML += `<tr><td>${user.username}</td><td>${user.type}</td><td>${renderDate(user.last_login)}</td><td><button class="mdui-btn mdui-btn-icon mdui-color-theme-accent mdui-ripple" onclick="runtime.user.functions.detailsDialog('${user.uuid}', '${user.username}', '${user.type}')"><i class="mdui-icon material-icons">settings</i></button></td><td><button class="mdui-btn mdui-btn-icon mdui-color-theme-accent mdui-ripple" onclick="runtime.user.functions.deleteDialog('${user.uuid}', '${user.username}', '${user.type}')"><i class="mdui-icon material-icons">delete_forever</i></button></td></tr>`
+            }
+            if (runtime.user.details !== undefined) {
+                permissionStyleToggle()
+            }
+        }
+        refreshButton.removeAttribute("disabled")
+        return true
+    })
+    .catch(function (error) {
+        progressBar.style.opacity = 0
+        refreshButton.removeAttribute("disabled")
+        if (error.response !== undefined) {
+            errorDialog("Error", error)
+            console.error(error)
+        } else {
+            if (error.response.status === 401) {
+                toLogin()
+            } else if (error.response.status === 403 || error.response.status === 400) {
+                document.getElementById("user-loading").style.opacity = 0
+                mdui.snackbar({
+                    message: error.response.data.message
+                });
+            } else {
+                errorDialog(error.response.status, error.response.text)
+            }
+        }
+        return false
+    });
+}
+
+function updateUserFromAdmin() {
+    fields = getFieldsForUpdatingForAdmin()
+    if (fields === null) {
+        mdui.snackbar({
+            message: "All the fields are empty",
+            timeout: 2000
+        })
+    }
+    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+    axios.put((serverAddr + '/user/update'), {
+        fields: JSON.stringify(fields)
+    }, {
+        headers: {
+            X_UUID: getUUID(),
+            X_OTP: getOTP()
+        }
+    })
+    .then(function (response) {
+        mdui.snackbar({
+            message: response.data.message,
+            timeout: 2000
+        })
+        if (fields.username === runtime.user.details.username) {
+            toLogin()
+        } else {
+            runtime.user.functions.getUsers()
+        }
+        return true
+    })
+    .catch(function (error) {
+        if (error.response !== undefined) {
+            errorDialog("Error", error)
+            console.error(error)
+        } else {
+            if (error.response.status === 401) {
+                toLogin()
+            } else if (error.response.status === 403 || error.response.status === 400 || error.response.status === 404) {
+                mdui.snackbar({
+                    message: error.response.data.message,
+                    timeout: 2000
+                });
+            } else {
+                errorDialog(error.response.status, error.response.text)
+            }
+        }
+        
+        return false
+    });
+}
+
+function updateUser() {
+    fields = getFieldsForUpdating()
+    if (fields === null) {
+        mdui.snackbar({
+            message: "All the fields are empty",
+            timeout: 2000
+        })
+    }
+    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+    axios.put((serverAddr + '/user/update'), {
+        fields: JSON.stringify(fields)
+    }, {
+        headers: {
+            X_UUID: getUUID(),
+            X_OTP: getOTP()
+        }
+    })
+    .then(function (response) {
+        mdui.snackbar({
+            message: response.data.message,
+            timeout: 2000
+        })
+        toLogin()
+        return true
+    })
+    .catch(function (error) {
+        if (error.response !== undefined) {
+            errorDialog("Error", error)
+            console.error(error)
+        } else {
+            if (error.response.status === 401) {
+                toLogin()
+            } else if (error.response.status === 403 || error.response.status === 400 || error.response.status === 404) {
+                mdui.snackbar({
+                    message: error.response.data.message,
+                    timeout: 2000
+                });
+            } else {
+                errorDialog(error.response.status, error.response.text)
+            }
+        }
+        return false
+    });
+}
+
+function updateDevice() {
+    fields = getFieldsForUpdatingDevice()
+    if (fields === null) {
+        mdui.snackbar({
+            message: "All the fields are empty",
+            timeout: 2000
+        })
+    }
+    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+    axios.put((serverAddr + '/device/update'), {
+        key: document.getElementById("device-settings-key").innerText,
+        fields: JSON.stringify(fields)
+    }, {
+        headers: {
+            X_UUID: getUUID(),
+            X_OTP: getOTP()
+        }
+    })
+    .then(function (response) {
+        mdui.snackbar({
+            message: response.data.message,
+            timeout: 2000
+        })
+        runtime.devices.functions.getDevices()
+        return true
+    })
+    .catch(function (error) {
+        if (error.response !== undefined) {
+            errorDialog("Error", error)
+            console.error(error)
+        } else {
+            if (error.response.status === 401) {
+                toLogin()
+            } else if (error.response.status === 403 || error.response.status === 400 || error.response.status === 404) {
+                mdui.snackbar({
+                    message: error.response.data.message,
+                    timeout: 2000
+                });
+            } else {
+                errorDialog(error.response.status, error.response.text)
+            }
+        }
+        return false
+    });
+}
+
+function updateEvent() {
+    fields = getFieldsForUpdatingEvent()
+    if (fields === null) {
+        mdui.snackbar({
+            message: "All the fields are empty",
+            timeout: 2000
+        })
+    }
+    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+    axios.put((serverAddr + '/event/update'), {
+        which: document.getElementById("event-settings-uuid").innerText,
+        fields: JSON.stringify(fields)
+    }, {
+        headers: {
+            X_UUID: getUUID(),
+            X_OTP: getOTP()
+        }
+    })
+    .then(function (response) {
+        mdui.snackbar({
+            message: "Event is updated",
+            timeout: 2000
+        })
+        runtime.events.functions.getEvents()
+        return true
+    })
+    .catch(function (error) {
+        if (error.response !== undefined) {
+            errorDialog("Error", error)
+            console.error(error)
+        } else {
+            if (error.response.status === 401) {
+                toLogin()
+            } else if (error.response.status === 403 || error.response.status === 400 || error.response.status === 404) {
+                mdui.snackbar({
+                    message: error.response.data.message,
+                    timeout: 2000
+                });
+            } else {
+                errorDialog(error.response.status, error.response.text)
+            }
+        }
+        return false
+    });
+}
+
+function deleteUser() {
+    const uuid = document.getElementById("user-deletion-uuid").innerText
+    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+    axios.delete((serverAddr + '/user/delete'), {
+        headers: {
+            X_UUID: getUUID(),
+            X_OTP: getOTP()
+        },
+        data: {
+            uuid
+        }
+    })
+    .then(function (response) {
+        mdui.snackbar({
+            message: response.data.message,
+            timeout: 2000
+        })
+        if (uuid === runtime.user.details.uuid) {
+            toLogin()
+        } else {
+            runtime.user.functions.getUsers()
+        }
+        return true
+    })
+    .catch(function (error) {
+        console.log(error)
+        
+        return false
+    });
+}
+
+function deleteDevice() {
+    const key = document.getElementById("device-deletion-key").innerText
+    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+    axios.delete((serverAddr + '/device/delete'), {
+        headers: {
+            X_UUID: getUUID(),
+            X_OTP: getOTP()
+        },
+        data: {
+            key
+        }
+    })
+    .then(function (response) {
+        mdui.snackbar({
+            message: response.data.message,
+            timeout: 2000
+        })
+        runtime.devices.functions.getDevices()
+        return true
+    })
+    .catch(function (error) {
+        if (error.response !== undefined) {
+            errorDialog("Error", error)
+            console.error(error)
+        } else {
+            if (error.response.status === 401) {
+                toLogin()
+            } else if (error.response.status === 403 || error.response.status === 400 || error.response.status === 404) {
+                mdui.snackbar({
+                    message: error.response.data.message,
+                    timeout: 2000
+                });
+            } else {
+                errorDialog(error.response.status, error.response.text)
+            }
+        }
+        return false
+    });
+}
+
+function deleteEvent() {
+    const uuid = document.getElementById("event-deletion-uuid").innerText
+    const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
+    axios.delete((serverAddr + '/event/delete'), {
+        headers: {
+            X_UUID: getUUID(),
+            X_OTP: getOTP()
+        },
+        data: {
+            which: uuid
+        }
+    })
+    .then(function (response) {
+        mdui.snackbar({
+            message: response.data.message,
+            timeout: 2000
+        })
+        runtime.events.functions.getEvents()
+        return true
+    })
+    .catch(function (error) {
+        if (error.response !== undefined) {
+            errorDialog("Error", error)
+            console.error(error)
+        } else {
+            if (error.response.status === 401) {
+                toLogin()
+            } else if (error.response.status === 403 || error.response.status === 400 || error.response.status === 404) {
+                mdui.snackbar({
+                    message: error.response.data.message,
+                    timeout: 2000
+                });
+            } else {
+                errorDialog(error.response.status, error.response.text)
+            }
+        }
+        return false
+    });
+}
+
 function pluginOff() {
     const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
     axios.put((serverAddr + '/event/clear'), {}, {
@@ -777,8 +924,16 @@ function pluginOff() {
         return true
     })
     .catch(function (error) {
-        console.log(error)
-        
+        if (error.response !== undefined) {
+            errorDialog("Error", error)
+            console.error(error)
+        } else {
+            if (error.response.status === 401) {
+                toLogin()
+            } else {
+                errorDialog(error.response.status, error.response.text)
+            }
+        }
         return false
     });
 }
@@ -808,9 +963,20 @@ function addDevice() {
         return true
     })
     .catch(function (error) {
-        console.log(error)
-        if (error.response.status === 403) {
-            runtime.misc.functions.errorDialog(error.response.status, error.response.text)
+        if (error.response !== undefined) {
+            errorDialog("Error", error)
+            console.error(error)
+        } else {
+            if (error.response.status === 401) {
+                toLogin()
+            } else if (error.response.status === 403 || error.response.status === 400 || error.response.status === 404) {
+                mdui.snackbar({
+                    message: error.response.data.message,
+                    timeout: 2000
+                });
+            } else {
+                errorDialog(error.response.status, error.response.text)
+            }
         }
         return false
     });
@@ -844,7 +1010,21 @@ function addUser() {
         return true
     })
     .catch(function (error) {
-        console.log(error)
+        if (error.response !== undefined) {
+            errorDialog("Error", error)
+            console.error(error)
+        } else {
+            if (error.response.status === 401) {
+                toLogin()
+            } else if (error.response.status === 403 || error.response.status === 400 || error.response.status === 404) {
+                mdui.snackbar({
+                    message: error.response.data.message,
+                    timeout: 2000
+                });
+            } else {
+                errorDialog(error.response.status, error.response.text)
+            }
+        }
         return false
     });
 }
@@ -854,27 +1034,16 @@ window.runtime = {
     server: {
         init: {
             loadServer
-        },
-        functions: {
-            getServerAddrFromLS
         }
     },
     user: {
-        init: {
-        },
         functions: {
             authUser,
             tryAuthFromForm,
-            toLogin,
-            calculateUUID,
-            clearLS,
             logout,
-            getUUID,
-            getOTP,
             getUser,
             getUsers,
             addUser,
-            permissionStyleToggle,
             updateUser,
             deleteUser,
             checkPassword,
@@ -903,14 +1072,10 @@ window.runtime = {
             deleteDialog: deleteDialogForEvent
         }
     },
-    inited: {
-        state: false
-    },
     misc: {
         functions: {
-            errorDialog,
-            renderDate,
-            checkUsernamePassword
+            checkUsernamePassword,
+            errorDialog
         }
     }
 }

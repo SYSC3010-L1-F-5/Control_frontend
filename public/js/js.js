@@ -64,7 +64,18 @@ barba.init({
                 document.getElementById("hss-loading-bar").classList.remove("hss-hidden")
             }
         }
-    ]
+    ],
+    requestError: (trigger, action, url, response) => {
+        // go to a custom 404 page if the user click on a link that return a 404 response status
+        if (action === 'click' && response.status && response.status === 404) {
+          runtime.misc.functions.errorDialog("404", "Page Not Found")
+        }
+    
+        // prevent Barba from redirecting the user to the requested URL
+        // this is equivalent to e.preventDefault() in this context
+        return false;
+    },
+    timeout: 5000
 });
 runtime.versions.barba = barba.version
 runtime.server.init.loadServer()
