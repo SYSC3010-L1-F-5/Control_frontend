@@ -82,7 +82,10 @@ Requirements:
 
 ``` bash
 $ pip install -r requirements.txt
+$ flask run --no-debugger --host=0.0.0.0 --port=5000
 ```
+
+The test program will be up and running at [http://localhost:5000](http://localhost:5000]) and listen to [http://0.0.0.0:5000](http://0.0.0.0:5000)
 
 Additonal System packages (tested under alpine):
 
