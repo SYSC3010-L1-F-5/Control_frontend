@@ -13,14 +13,15 @@
         <table class="mdui-table mdui-table-hoverable">
           <thead>
             <tr>
-              <th>IP</th>
-              <th>Port</th>
-              <th>Zone</th>
-              <th>Type</th>
-              <th>Name</th>
-              <th>Last seen</th>
-              <th>Settings</th>
-              <th>Remove</th>
+                <th>Status</th>
+                <th>IP</th>
+                <th>Port</th>
+                <th>Zone</th>
+                <th>Type</th>
+                <th>Name</th>
+                <th>Last seen</th>
+                <th>Settings</th>
+                <th>Remove</th>
             </tr>
           </thead>
           <tbody id="devices-table-body">
@@ -51,6 +52,11 @@
             <label class="mdui-textfield-label">Name</label>
             <input class="mdui-textfield-input" type="text" id="new-device-name" pattern="[^' ']+"/>
         </div>
+        <label class="mdui-checkbox">
+            <input type="checkbox" id="new-device-status"/>
+            <i class="mdui-checkbox-icon" checked></i>
+            Enable
+        </label>
     </div>
     <div class="mdui-dialog-actions">
       <button class="mdui-btn mdui-ripple" onclick="runtime.misc.current_dialog.close()">Cancel</button>
@@ -97,6 +103,11 @@
             <label class="mdui-textfield-label">Name</label>
             <input class="mdui-textfield-input" type="text" id="device-settings-name" pattern="[^' ']+"/>
         </div>
+        <label class="mdui-checkbox">
+            <input type="checkbox" id="device-settings-status"/>
+            <i class="mdui-checkbox-icon"></i>
+            Enable
+        </label>
     </div>
     <div class="mdui-dialog-actions">
       <button class="mdui-btn mdui-ripple" onclick="runtime.misc.current_dialog.close()">Cancel</button>

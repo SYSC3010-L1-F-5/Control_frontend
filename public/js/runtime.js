@@ -143,6 +143,7 @@ function detailsDialogForDevice() {
     deviceZone = document.getElementById("device-settings-zone")
     deviceType = document.getElementById("device-settings-type")
     deviceName = document.getElementById("device-settings-name")
+    deviceStatus = document.getElementById("device-settings-status")
     deviceIP.parentElement.classList.remove("mdui-textfield-invalid-html5")
     devicePort.parentElement.classList.remove("mdui-textfield-invalid-html5")
     deviceZone.parentElement.classList.remove("mdui-textfield-invalid-html5")
@@ -155,6 +156,7 @@ function detailsDialogForDevice() {
     deviceZone.value = arguments[4]
     deviceType.value = arguments[5]
     deviceName.value = arguments[6]
+    deviceStatus.checked = (parseInt(arguments[7]) === 1 ? true : false)
     runtime.misc.current_dialog = new mdui.Dialog('#device-settings');
     runtime.misc.current_dialog.open()
 }
@@ -177,6 +179,7 @@ function addDialogForDevice() {
     deviceZone = document.getElementById("new-device-zone")
     deviceType = document.getElementById("new-device-type")
     deviceName = document.getElementById("new-device-name")
+    deviceStatus = document.getElementById("new-device-status")
     deviceIP.parentElement.classList.remove("mdui-textfield-invalid-html5")
     devicePort.parentElement.classList.remove("mdui-textfield-invalid-html5")
     deviceType.parentElement.classList.remove("mdui-textfield-invalid-html5")
@@ -187,6 +190,7 @@ function addDialogForDevice() {
     deviceType.value = null
     deviceZone.value = null
     deviceName.value = null
+    deviceName.checked = true
     runtime.misc.current_dialog = new mdui.Dialog('#device-add');
     runtime.misc.current_dialog.open()
 }
@@ -196,6 +200,14 @@ function renderDeviceForEvents(device, key) {
         return "Unknown"
     } else {
         return device[key]
+    }
+}
+
+function renderBooleaForDevice(e) {
+    if (parseInt(e) === 1) {
+        return "Enabled"
+    } else {
+        return "Disabled"
     }
 }
 
@@ -373,6 +385,7 @@ function getFieldsForUpdatingDevice() {
     deviceZone = document.getElementById("device-settings-zone")
     deviceType = document.getElementById("device-settings-type")
     deviceName = document.getElementById("device-settings-name")
+    deviceStatus = document.getElementById("device-settings-status")
     fields = {}
     invalidFields = []
     if (deviceIP.parentElement.classList.contains("mdui-textfield-invalid-html5")) {
@@ -455,6 +468,14 @@ function getFieldsForUpdatingDevice() {
             fields = null
         }
     }
+    if (fields !== null) {
+        if (deviceStatus.checked) {
+            fields.is_enabled = 1
+        } else {
+            fields.is_enabled = 0
+        }
+    }
+
     return {
         fields,
         invalidFields: invalidFields.join(", ")
@@ -493,6 +514,7 @@ function getFieldsForAddingDevice() {
     deviceZone = document.getElementById("new-device-zone")
     deviceType = document.getElementById("new-device-type")
     deviceName = document.getElementById("new-device-name")
+    deviceStatus = document.getElementById("new-device-status")
     fields = {}
     invalidFields = []
     if (deviceIP.parentElement.classList.contains("mdui-textfield-invalid-html5")) {
@@ -573,6 +595,13 @@ function getFieldsForAddingDevice() {
             deviceName.parentElement.classList.add("mdui-textfield-invalid-html5")
             invalidFields.push("Name")
             fields = null
+        }
+    }
+    if (fields !== null) {
+        if (deviceStatus.checked) {
+            fields.is_enabled = 1
+        } else {
+            fields.is_enabled = 0
         }
     }
     return {
@@ -673,7 +702,7 @@ function authUser(userUUID) {
         document.getElementById("hss-loading-bar").classList.add("hss-hidden")
         if (error.response === undefined) {
             errorDialog("Error", error)
-            console.error(error)
+            console.log(error)
         } else {
             if (error.response.status === 401) {
                 document.getElementById("username").parentElement.classList.add("mdui-textfield-invalid")
@@ -737,7 +766,12 @@ function logout() {
             X_OTP: getOTP()
         }
     })
-    .then(function (response) {
+        .then(function (response) {
+        console.log(response.data.message)
+        mdui.snackbar({
+            message: "You have successfully logged out",
+            timeout: 2000
+        })
         toLogin()
         return true
     })
@@ -745,7 +779,7 @@ function logout() {
         document.getElementById("hss-loading-bar").classList.add("hss-hidden")
         if (error.response === undefined) {
             errorDialog("Error", error)
-            console.error(error)
+            console.log(error)
         }  else if (error.response.status === 400) { 
             mdui.snackbar({
                 message: error.response.data.message,
@@ -781,11 +815,16 @@ function getDevices() {
                 message: "No device is added",
                 timeout: 2000
             })
+        } else if (runtime.devices.list === undefined) { 
+            mdui.snackbar({
+                message: "The server is not working correctly",
+                timeout: 2000
+            })
         } else {
             for (var i = 0; i < runtime.devices.list.length; i++) {
                 device = runtime.devices.list[i]
                 document.getElementById("devices-table-body").innerHTML += `<tr>
-                <td>${device.ip}</td><td>${device.port}</td><td>${device.zone}</td><td>${device.type}</td><td>${device.name}</td><td>${renderDate(device.pulse)}</td><td><button class="mdui-btn mdui-btn-icon mdui-color-theme-accent mdui-ripple" onclick="runtime.devices.functions.detailsDialog('${device.uuid}','${device.key}', '${device.ip}', '${device.port}', '${device.zone}','${device.type}','${device.name}')" hss-permission="admin" disabled><i class="mdui-icon material-icons">settings</i></button></td><td><button class="mdui-btn mdui-btn-icon mdui-color-theme-accent mdui-ripple" onclick="runtime.devices.functions.deleteDialog('${device.uuid}','${device.key}', '${device.ip}', '${device.port}', '${device.zone}','${device.type}','${device.name}')" hss-permission="admin" disabled><i class="mdui-icon material-icons">delete_forever</i></button></td></tr>`
+                <td>${renderBooleaForDevice(device.is_enabled)}</td><td>${device.ip}</td><td>${device.port}</td><td>${device.zone}</td><td>${device.type}</td><td>${device.name}</td><td>${renderDate(device.pulse)}</td><td><button class="mdui-btn mdui-btn-icon mdui-color-theme-accent mdui-ripple" onclick="runtime.devices.functions.detailsDialog('${device.uuid}','${device.key}', '${device.ip}', '${device.port}', '${device.zone}','${device.type}','${device.name}', '${device.is_enabled}')" hss-permission="admin" disabled><i class="mdui-icon material-icons">settings</i></button></td><td><button class="mdui-btn mdui-btn-icon mdui-color-theme-accent mdui-ripple" onclick="runtime.devices.functions.deleteDialog('${device.uuid}','${device.key}', '${device.ip}', '${device.port}', '${device.zone}','${device.type}','${device.name}', '${device.is_enabled}')" hss-permission="admin" disabled><i class="mdui-icon material-icons">delete_forever</i></button></td></tr>`
             }
             if (runtime.user.details !== undefined) {
                 permissionStyleToggle()
@@ -799,7 +838,7 @@ function getDevices() {
         document.getElementById("device-list-refresh").removeAttribute("disabled")
         if (error.response === undefined) {
             errorDialog("Error", error)
-            console.error(error)
+            console.log(error)
         } else {
             if (error.response.status === 401) {
                 toLogin()
@@ -839,6 +878,11 @@ function getEvents() {
                 message: "No event is received",
                 timeout: 2000
             })
+        } else if (runtime.events.list === undefined) { 
+            mdui.snackbar({
+                message: "The server is not working correctly",
+                timeout: 2000
+            })
         } else {
             for (var i = 0; i < runtime.events.list.length; i++) {
                 eventDetails = runtime.events.list[i]
@@ -857,7 +901,7 @@ function getEvents() {
         refreshButton.removeAttribute("disabled")
         if (error.response === undefined) {
             errorDialog("Error", error)
-            console.error(error)
+            console.log(error)
         } else {
             if (error.response.status === 401) {
                 toLogin()
@@ -875,6 +919,7 @@ function getEvents() {
 }
 
 function getUser() {
+    const userSettingsButton = document.getElementById("user-settings-button")
     const serverAddr = "http://" + runtime.server.address + ":" + runtime.server.port
     axios.get((serverAddr + '/user'), {
         headers: {
@@ -885,13 +930,16 @@ function getUser() {
     .then(function (response) {
         runtime.user.details = response.data.message
         indexSetup()
+        if (userSettingsButton !== null) {
+            userSettingsButton.removeAttribute("disabled")
+        }
         permissionStyleToggle()
         return true
     })
     .catch(function (error) {
         if (error.response === undefined) {
             errorDialog("Error", error)
-            console.error(error)
+            console.log(error)
         } else {
             if (error.response.status === 401) {
                 toLogin()
@@ -930,6 +978,11 @@ function getUsers() {
             mdui.snackbar({
                 message: "The system has no user added, please add user first"
             })
+        } else if (runtime.user.list === undefined) { 
+            mdui.snackbar({
+                message: "The server is not working correctly",
+                timeout: 2000
+            })
         } else {
             for (var i = 0; i < runtime.user.list.length; i++) {
                 user = runtime.user.list[i]
@@ -947,7 +1000,7 @@ function getUsers() {
         refreshButton.removeAttribute("disabled")
         if (error.response === undefined) {
             errorDialog("Error", error)
-            console.error(error)
+            console.log(error)
         } else {
             if (error.response.status === 401) {
                 toLogin()
@@ -1005,7 +1058,7 @@ function updateUserFromAdmin() {
         .catch(function (error) {
             if (error.response === undefined) {
                 errorDialog("Error", error)
-                console.error(error)
+                console.log(error)
             } else {
                 if (error.response.status === 401) {
                     toLogin()
@@ -1059,7 +1112,7 @@ function updateUser() {
         .catch(function (error) {
             if (error.response === undefined) {
                 errorDialog("Error", error)
-                console.error(error)
+                console.log(error)
             } else {
                 if (error.response.status === 401) {
                     toLogin()
@@ -1113,7 +1166,7 @@ function updateDevice() {
         .catch(function (error) {
             if (error.response === undefined) {
                 errorDialog("Error", error)
-                console.error(error)
+                console.log(error)
             } else {
                 if (error.response.status === 401) {
                     toLogin()
@@ -1167,7 +1220,7 @@ function updateEvent() {
         .catch(function (error) {
             if (error.response === undefined) {
                 errorDialog("Error", error)
-                console.error(error)
+                console.log(error)
             } else {
                 if (error.response.status === 401) {
                     toLogin()
@@ -1239,7 +1292,7 @@ function deleteDevice() {
     .catch(function (error) {
         if (error.response === undefined) {
             errorDialog("Error", error)
-            console.error(error)
+            console.log(error)
         } else {
             if (error.response.status === 401) {
                 toLogin()
@@ -1279,7 +1332,7 @@ function deleteEvent() {
     .catch(function (error) {
         if (error.response === undefined) {
             errorDialog("Error", error)
-            console.error(error)
+            console.log(error)
         } else {
             if (error.response.status === 401) {
                 toLogin()
@@ -1314,7 +1367,7 @@ function pluginOff() {
     .catch(function (error) {
         if (error.response === undefined) {
             errorDialog("Error", error)
-            console.error(error)
+            console.log(error)
         } else {
             if (error.response.status === 401) {
                 toLogin()
@@ -1347,7 +1400,8 @@ function addDevice() {
             port: fields.port,
             type: fields.type,
             zone: fields.zone,
-            name: fields.name
+            name: fields.name,
+            is_enabled : fields.is_enabled
         },{
             headers: {
                 X_UUID: getUUID(),
@@ -1363,7 +1417,7 @@ function addDevice() {
         .catch(function (error) {
             if (error.response === undefined) {
                 errorDialog("Error", error)
-                console.error(error)
+                console.log(error)
             } else {
                 if (error.response.status === 401) {
                     toLogin()
@@ -1416,7 +1470,7 @@ function addUser() {
         .catch(function (error) {
             if (error.response === undefined) {
                 errorDialog("Error", error)
-                console.error(error)
+                console.log(error)
             } else {
                 if (error.response.status === 401) {
                     toLogin()

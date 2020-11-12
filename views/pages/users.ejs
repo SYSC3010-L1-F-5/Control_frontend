@@ -2,7 +2,7 @@
     <div class="mdui-card-primary">
         <div class="mdui-card-primary-title">
             Users
-            <button class="mdui-btn mdui-ripple mdui-btn-icon mdui-color-theme-accent mdui-float-right hss-margin-left-8"  mdui-tooltip="{content: 'Account Settings'}" onclick="runtime.user.functions.accountSettingsDialog()"><i class="mdui-icon material-icons">settings</i></button>
+            <button class="mdui-btn mdui-ripple mdui-btn-icon mdui-color-theme-accent mdui-float-right hss-margin-left-8"  mdui-tooltip="{content: 'Account Settings'}" onclick="runtime.user.functions.accountSettingsDialog()" id="user-settings-button" disabled><i class="mdui-icon material-icons">settings</i></button>
             <button class="mdui-btn mdui-ripple mdui-btn-icon mdui-float-right mdui-color-theme-accent hss-margin-left-8" onclick="runtime.user.functions.getUsers()" mdui-tooltip="{content: 'Refresh'}" hss-permission="admin" id="user-list-refresh" disabled><i class="mdui-icon material-icons">refresh</i></button>
             <button class="mdui-btn mdui-ripple mdui-btn-icon mdui-color-theme-accent mdui-float-right" mdui-tooltip="{content: 'Add a new user'}" hss-permission="admin" disabled onclick="runtime.user.functions.addDialogForUser()"><i class="mdui-icon material-icons" disabled>add</i></button>
         </div>
@@ -87,13 +87,11 @@
             <label class="mdui-textfield-label">Password</label>
             <input class="mdui-textfield-input" type="password" id="user-settings-password" pattern="[^' ']+"/>
         </div>
-        <div class="mdui-textfield hss-overflow-visible">
-            <label class="mdui-checkbox">
-                <input type="checkbox"  id="user-settings-type"/>
-                <i class="mdui-checkbox-icon"></i>
-                Admin
-            </label>
-        </div>
+        <label class="mdui-checkbox">
+            <input type="checkbox" id="user-settings-type"/>
+            <i class="mdui-checkbox-icon"></i>
+            Admin
+        </label>
     </div>
     <div class="mdui-dialog-actions">
       <button class="mdui-btn mdui-ripple" onclick="runtime.misc.current_dialog.close()">Cancel</button>
